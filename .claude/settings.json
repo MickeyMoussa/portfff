@@ -7,7 +7,8 @@
       "Bash(curl -s \"https://api.github.com/repos/Adriwin06/black-hole/branches\")",
       "Bash(Get-ChildItem -Recurse -File)",
       "Bash(Select-Object FullName)",
-      "Bash(Format-Table -AutoSize)"
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(& \"C:\\\\Users\\\\Gaming\\\\Desktop\\\\portf\\\\_shot.ps1\" -W 1280 -H 760 -Budget 13000)"
     ]
   }
 }

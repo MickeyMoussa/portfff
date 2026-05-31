@@ -106,31 +106,107 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Hero Center ── */
 .hero-center {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: .9rem;
+  transform: translateY(-3vh);
   pointer-events: none;
   user-select: none;
 }
 
+/* Soft scrim behind the NAME so it stays legible over the bright disk.
+   (The CTAs below rely on the WebGL lens bending light around them instead.) */
+.hero-center::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 38%;
+  width: min(680px, 90vw);
+  height: 220px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center,
+              rgba(0,0,0,.52) 0%, rgba(0,0,0,.30) 44%, rgba(0,0,0,0) 72%);
+  z-index: -1;
+  pointer-events: none;
+}
+
 .hero-name {
-  font-size: clamp(3.2rem, 9vw, 8rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.25em;            /* reserve the line so layout never jumps */
+  font-size: clamp(2.6rem, 8vw, 6rem);
   font-weight: 200;
-  letter-spacing: .35em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.88);
+  letter-spacing: .015em;
+  white-space: pre;              /* preserve the apostrophe/spacing */
+  color: rgba(255,255,255,.92);
   text-shadow:
+    0 2px 28px rgba(0,0,0,.55),
     0 0  50px rgba(100,165,255,.25),
     0 0 120px rgba(100,165,255,.10);
 }
 
-.hero-role {
-  font-size: .78rem;
-  font-weight: 300;
-  letter-spacing: .42em;
+.type-text { white-space: pre; }
+
+/* Blinking caret — solid while typing, blinks once finished */
+.caret {
+  display: inline-block;
+  width: clamp(2px, .045em, 4px);
+  height: 1.04em;
+  margin-left: .09em;
+  transform: translateY(.05em);
+  background: rgba(130,195,255,.95);
+  box-shadow: 0 0 14px rgba(120,185,255,.85);
+  animation: caret-blink 1.05s steps(1) infinite;
+}
+.hero-name.is-typing .caret { animation: none; opacity: 1; }
+
+@keyframes caret-blink {
+  0%, 50%       { opacity: 1; }
+  50.01%, 100%  { opacity: 0; }
+}
+
+/* ── Hero CTAs ── */
+.hero-cta {
+  display: flex;
+  gap: 1.9rem;
+  margin-top: 2.3rem;
+  pointer-events: all;
+  opacity: 0;
+  /* fade only — no movement, so the WebGL light-lens stays locked to the labels */
+  transition: opacity 1s ease;
+}
+.hero-cta.is-visible { opacity: 1; }
+
+/* Text-only labels in the same blue as the typing caret — no enclosure.
+   The black-hole renderer bends the disk light around them (see blackhole.js). */
+.cta {
+  position: relative;
+  font-size: .76rem;
+  font-weight: 400;
+  letter-spacing: .18em;
   text-transform: uppercase;
-  color: var(--white-30);
+  color: rgba(130,195,255,.92);
+  padding: .5rem .7rem;
+  text-shadow: 0 0 18px rgba(110,180,255,.45), 0 2px 16px rgba(0,0,0,.5);
+  transition: color .3s, text-shadow .3s, transform .3s, letter-spacing .3s;
+}
+.cta:hover,
+.cta:focus-visible {
+  outline: none;
+  color: #d8ecff;
+  text-shadow: 0 0 26px rgba(140,200,255,.7), 0 2px 16px rgba(0,0,0,.5);
+  letter-spacing: .2em;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 540px) {
+  .hero-cta { flex-direction: column; align-items: center; gap: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret { animation: none; }
+  .hero-cta { transition: none; }
 }
 
 /* ── Scroll Cue ── */
