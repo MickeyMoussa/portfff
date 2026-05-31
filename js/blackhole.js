@@ -80,7 +80,9 @@ vec3 blackbody(float t){
 
 // ── Background sky (sampled along the escaped ray direction) ────────────────
 vec3 starfield(vec3 dir){
-  vec2 uv = vec2(atan(dir.y, dir.x), asin(clamp(dir.z, -1.0, 1.0)));
+  // Azimuth uses -dir.x so the atan() wrap-around seam sits BEHIND the camera
+  // (which looks toward -x) instead of through the middle of the view.
+  vec2 uv = vec2(atan(dir.y, -dir.x), asin(clamp(dir.z, -1.0, 1.0)));
   vec3 col = vec3(0.0);
 
   vec2 np = uv * vec2(1.5, 3.0);
@@ -92,18 +94,28 @@ vec3 starfield(vec3 dir){
   float band = exp(-dir.z*dir.z * 7.0);
   col += vec3(0.030, 0.045, 0.080) * band * pow(fbm(np*1.2 + 5.0), 2.0) * 0.6;
 
+  // Layered stars. Sample the 3x3 cell neighbourhood so a star whose centre sits
+  // near a cell edge is drawn whole, instead of being clipped along the grid.
   for (int k = 0; k < 3; k++){
-    float sc   = 90.0 + float(k)*150.0;
-    vec2  g    = uv * sc;
-    vec2  cell = floor(g);
-    float h    = hash12(cell + float(k)*37.0);
-    if (h > 0.93){
-      vec2  c  = cell + vec2(hash12(cell + 1.3), hash12(cell + 2.7));
-      float d  = length(g - c);
-      float tw = 0.6 + 0.4*sin(u_time*3.0 + h*60.0);
-      float s  = smoothstep(0.5, 0.0, d) * (h - 0.93)/0.07;
-      col += vec3(0.90, 0.95, 1.00) * s * tw * 1.1;
+    float sc = 90.0 + float(k)*150.0;
+    vec2  g  = uv * sc;
+    vec2  gi = floor(g);
+    vec2  gf = g - gi;
+    float star = 0.0;
+    for (int oy = -1; oy <= 1; oy++){
+      for (int ox = -1; ox <= 1; ox++){
+        vec2  off  = vec2(float(ox), float(oy));
+        vec2  cell = gi + off;
+        float h    = hash12(cell + float(k)*37.0);
+        if (h > 0.93){
+          vec2  c  = off + vec2(hash12(cell + 1.3), hash12(cell + 2.7));
+          float d  = length(gf - c);
+          float tw = 0.6 + 0.4*sin(u_time*3.0 + h*60.0);
+          star += smoothstep(0.45, 0.0, d) * (h - 0.93)/0.07 * tw;
+        }
+      }
     }
+    col += vec3(0.90, 0.95, 1.00) * star * 1.1;
   }
   return col;
 }
@@ -310,8 +322,9 @@ class BlackHole {
     this.AZ_AMP = 0.16;
     this.EL_AMP = 0.09;
 
-    this.az = this.AZ0;  this.el = this.EL0;
-    this.azT = this.AZ0; this.elT = this.EL0;
+    this.az = this.AZ0;  this.el = this.EL0;     // current (eased) angles
+    this.azT = this.AZ0; this.elT = this.EL0;    // per-frame target
+    this.curAz = 0; this.curEl = 0;              // pointer/touch offset (0 if none)
 
     this.time = 0; this.last = 0;
     this.scale = 1.0;
@@ -486,9 +499,19 @@ class BlackHole {
       if (dot) { dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px'; }
       const mx = (e.clientX / innerWidth)  * 2 - 1;
       const my = (e.clientY / innerHeight) * 2 - 1;
-      this.azT = this.AZ0 + mx * this.AZ_AMP;
-      this.elT = Math.max(0.02, Math.min(0.30, this.EL0 - my * this.EL_AMP));
+      this.curAz =  mx * this.AZ_AMP;
+      this.curEl = -my * this.EL_AMP;
     }, { passive: true });
+
+    // Touch: dragging tilts the view too; release returns to the ambient drift.
+    const touch = e => {
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      this.curAz =  ((t.clientX / innerWidth)  * 2 - 1) * this.AZ_AMP;
+      this.curEl = -((t.clientY / innerHeight) * 2 - 1) * this.EL_AMP;
+    };
+    window.addEventListener('touchmove',  touch, { passive: true });
+    window.addEventListener('touchend', () => { this.curAz = 0; this.curEl = 0; }, { passive: true });
 
     if (dot && ring) {
       const tick = () => {
@@ -552,6 +575,14 @@ class BlackHole {
     if (!this.gl || this.contextLost || !this.tabVisible || !this.inView) return;
 
     this.time += dt;
+
+    // Ambient circulation so the lensed light stays alive with no pointer (e.g.
+    // touchscreens). Two slow, out-of-phase terms give an organic, non-repeating
+    // drift; cursor/touch input rides on top of it.
+    const ambAz = Math.sin(this.time * 0.31) * 0.055 + Math.sin(this.time * 0.13) * 0.028;
+    const ambEl = Math.cos(this.time * 0.31) * 0.032 + Math.cos(this.time * 0.18) * 0.016;
+    this.azT = this.AZ0 + ambAz + this.curAz;
+    this.elT = Math.max(0.02, Math.min(0.30, this.EL0 + ambEl + this.curEl));
 
     const s = 1 - Math.exp(-dt * 4.5);
     this.az += (this.azT - this.az) * s;
