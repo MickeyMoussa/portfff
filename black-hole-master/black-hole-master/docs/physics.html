@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics of the Black Hole Simulation</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/img/icons/atom.svg"> 
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --heading: #e6edf3;
+            --accent: #58a6ff;
+            --accent2: #f0883e;
+            --code-bg: #1c2128;
+            --eq-bg: #1c2128;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            font-size: 2.2rem;
+            color: var(--heading);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.6rem;
+            color: var(--accent);
+            margin-top: 2.8rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+        h3 {
+            font-size: 1.25rem;
+            color: var(--accent2);
+            margin-top: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        h4 {
+            font-size: 1.05rem;
+            color: var(--heading);
+            margin-top: 1.3rem;
+            margin-bottom: 0.4rem;
+        }
+        p { margin-bottom: 0.9rem; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code {
+            background: var(--code-bg);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            font-size: 0.92em;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; }
+        .eq {
+            background: var(--eq-bg);
+            border-left: 3px solid var(--accent);
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-family: 'Georgia', serif;
+            font-size: 1.05em;
+            overflow-x: auto;
+        }
+        .note {
+            background: #1a2332;
+            border-left: 3px solid var(--accent2);
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .comparison {
+            background: #1a2a1a;
+            border-left: 3px solid #3fb950;
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .limitation {
+            background: #2a1a1a;
+            border-left: 3px solid #f85149;
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.8rem;
+            text-align: left;
+        }
+        th { background: var(--card); color: var(--heading); }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        .ref { font-size: 0.85em; color: #8b949e; }
+        .ref a { color: #8b949e; }
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .toc h2 { margin-top: 0; border: none; font-size: 1.2rem; }
+        .toc ol { margin-top: 0.5rem; }
+        .toc li { margin-bottom: 0.2rem; }
+        .toc a { color: var(--text); }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+        sup { font-size: 0.75em; }
+        sup a { color: var(--accent2); }
+        .references { font-size: 0.9em; }
+        .references li { margin-bottom: 0.5rem; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<a href="../index.html" class="back-link">&larr; Back to simulation</a>
+
+<h1>Physics of the Black Hole Simulation</h1>
+
+<p>
+    This document provides a comprehensive description of every physics model, equation, and
+    approximation used in this interactive black hole ray-tracing simulation.
+    Each section traces the origin of the equations to their foundational references
+    and discusses where the simulation is physically accurate and where it departs from reality.
+</p>
+
+<div class="note">
+    <strong>Scope note:</strong> Schwarzschild photon geodesics are modeled from the exact Binet equation.
+    Spinning-hole lensing, accretion-flow emission, jet emission, and the GRMHD-inspired controls
+    are progressively more approximate and are documented as such below.
+</div>
+
+<!-- ============================================================ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ============================================================ -->
+
+<nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+        <li><a href="#sec-units">Units and Conventions</a></li>
+        <li><a href="#sec-schwarzschild">Schwarzschild Metric and Null Geodesics</a></li>
+        <li><a href="#sec-binet">The Binet Equation for Photons</a></li>
+        <li><a href="#sec-integration">Numerical Integration (Leapfrog &amp; RK4)</a></li>
+        <li><a href="#sec-kerr">Kerr Black Hole &amp; Frame Dragging</a>
+            <ol>
+                <li><a href="#sec-kerr-perturbative">Public spin approximation (all exposed modes)</a></li>
+                <li><a href="#sec-kerr-mino">True Kerr geodesics (Mino-time formulation)</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-isco">ISCO: Innermost Stable Circular Orbit</a></li>
+        <li><a href="#sec-accretion">Accretion Disk Models</a>
+            <ol>
+                <li><a href="#sec-thin-disk">Thin Disk (Novikov–Thorne / Shakura–Sunyaev)</a></li>
+                <li><a href="#sec-thick-torus">Thick Torus (ADAF/RIAF)</a></li>
+                <li><a href="#sec-slim-disk">Slim Disk (Super-Eddington)</a></li>
+                <li><a href="#sec-self-irradiation">Disk Self-Irradiation (Returning Radiation)</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-blackbody">Black-Body Radiation &amp; Spectrum</a></li>
+        <li><a href="#sec-grav-redshift">Gravitational Redshift</a></li>
+        <li><a href="#sec-doppler">Relativistic Doppler Effect</a></li>
+        <li><a href="#sec-beaming">Relativistic Beaming &amp; Liouville's Theorem</a></li>
+        <li><a href="#sec-aberration">Relativistic Aberration</a></li>
+        <li><a href="#sec-observer">Observer Kinematics &amp; Time Dilation</a></li>
+        <li><a href="#sec-blueshift">Gravitational Blueshift &amp; Hovering Observer</a>
+            <ol>
+                <li><a href="#sec-blueshift-static">Static (Hovering) Observer</a></li>
+                <li><a href="#sec-blueshift-freefall">Free-Falling Observer</a></li>
+                <li><a href="#sec-blueshift-impl">Implementation</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-jets">Relativistic Jets</a></li>
+        <li><a href="#sec-grmhd">GRMHD-Inspired Mode</a>
+            <ol>
+                <li><a href="#sec-grmhd-two-temp">Two-Temperature Plasma (R<sub>high</sub>)</a></li>
+                <li><a href="#sec-grmhd-synchrotron">Thermal Synchrotron Emission</a></li>
+                <li><a href="#sec-grmhd-mri">MRI Turbulence &amp; MAD State</a></li>
+                <li><a href="#sec-grmhd-fishbone">Fishbone-Moncrief-Inspired Helper</a></li>
+                <li><a href="#sec-grmhd-turbulence-temperature">High-Frequency Chaos &amp; Dynamic Thermal Bands</a></li>
+                <li><a href="#sec-grmhd-nonthermal">Non-Thermal Electrons (κ-distribution)</a></li>
+                <li><a href="#sec-grmhd-isco">Non-Zero ISCO Stress</a></li>
+                <li><a href="#sec-grmhd-bz">Blandford-Znajek Jet Power</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-volumetric">Volumetric Radiative Transfer</a></li>
+        <li><a href="#sec-tonemap">Tone Mapping &amp; Color Science</a></li>
+        <li><a href="#sec-planet">Planet Model</a></li>
+        <li><a href="#sec-interior">Interior Black Hole &amp; Analytical Escape Classification</a>
+            <ol>
+                <li><a href="#sec-binet-energy">Binet Conserved Energy</a></li>
+                <li><a href="#sec-escape-class">Escape vs. Capture Classification</a></li>
+                <li><a href="#sec-analytical-exit">Analytical Exit Direction</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-freefall">Free-Fall Dive &amp; Observer Frame</a>
+            <ol>
+                <li><a href="#sec-radial-freefall">Radial Free-Fall Trajectory</a></li>
+                <li><a href="#sec-dive-frame">Locally Inertial Dive Frame</a></li>
+                <li><a href="#sec-interior-rendering">Interior Rendering Pipeline</a></li>
+            </ol>
+        </li>
+        <li><a href="#sec-cinematic-speed">Cinematic Auto-Speed Envelope</a></li>
+        <li><a href="#sec-comparison">Comparison with Reality</a></li>
+        <li><a href="#sec-limitations">Known Limitations &amp; Approximations</a></li>
+        <li><a href="#sec-references">References</a></li>
+    </ol>
+</nav>
+
+<!-- ============================================================ -->
+<!-- 1. UNITS -->
+<!-- ============================================================ -->
+
+<h2 id="sec-units">1. Units and Conventions</h2>
+
+<p>
+    The simulation uses <strong>geometrized units</strong> where:
+</p>
+<ul>
+    <li>The <strong>Schwarzschild radius</strong> is set to unity: <em>r<sub>s</sub></em> = 1.</li>
+    <li>The <strong>speed of light</strong> <em>c</em> = 1 (one spatial unit per second of simulation time).</li>
+    <li>The <strong>black hole mass</strong> parameter <em>M</em> = <em>r<sub>s</sub></em>/2 = 0.5, since <em>r<sub>s</sub></em> = 2<em>GM</em>/<em>c</em>&sup2;.</li>
+</ul>
+<p>
+    All distances in the simulation (observer distance, planet orbit, accretion disk extent) are expressed in
+    multiples of <em>r<sub>s</sub></em>. This normalization is standard in numerical relativity for Schwarzschild spacetimes
+    <sup><a href="#ref-mtw">[1]</a></sup>.
+</p>
+
+<div class="note">
+    <strong>Design choice:</strong> Setting <em>r<sub>s</sub></em> = 1 rather than <em>r<sub>g</sub></em> = <em>GM</em>/<em>c</em>&sup2; = 1 keeps equations simple:
+    the event horizon sits at <em>r</em> = 1, the photon sphere at <em>r</em> = 1.5, and the ISCO at <em>r</em> = 3
+    (for Schwarzschild). When converting to Kerr spin parameters, the code maps between
+    <em>r<sub>s</sub></em> and <em>r<sub>g</sub></em> units with the factor 0.5.
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. SCHWARZSCHILD METRIC -->
+<!-- ============================================================ -->
+
+<h2 id="sec-schwarzschild">2. Schwarzschild Metric and Null Geodesics</h2>
+
+<p>
+    The spacetime around a non-rotating, uncharged black hole of mass <em>M</em> is described by the
+    <strong>Schwarzschild metric</strong> (1916) <sup><a href="#ref-schwarzschild">[2]</a></sup>:
+</p>
+<div class="eq">
+    d<em>s</em>&sup2; = &minus;(1 &minus; <em>r<sub>s</sub></em>/<em>r</em>) <em>c</em>&sup2; d<em>t</em>&sup2;
+    + (1 &minus; <em>r<sub>s</sub></em>/<em>r</em>)<sup>&minus;1</sup> d<em>r</em>&sup2;
+    + <em>r</em>&sup2; (d&theta;&sup2; + sin&sup2;&theta; d&phi;&sup2;)
+</div>
+<p>
+    where <em>r<sub>s</sub></em> = 2<em>GM</em>/<em>c</em>&sup2; is the Schwarzschild radius.
+    For photons (null geodesics), d<em>s</em>&sup2; = 0.
+</p>
+<p>
+    The motion of photons is governed by two conserved quantities arising from the metric's symmetries:
+    <strong>energy</strong> <em>E</em> (time-translation symmetry) and <strong>angular momentum</strong> <em>L</em> (rotational symmetry).
+    By restricting motion to the equatorial plane (&theta; = &pi;/2), which is always possible by symmetry,
+    the orbit equation can be derived from these conservation laws and the null condition
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-wald">[3]</a></sup>.
+</p>
+
+<!-- ============================================================ -->
+<!-- 3. BINET EQUATION -->
+<!-- ============================================================ -->
+
+<h2 id="sec-binet">3. The Binet Equation for Photons</h2>
+
+<p>
+    The core of the simulation's gravitational lensing is the <strong>Binet equation</strong> for null geodesics
+    in Schwarzschild spacetime. Using the substitution <em>u</em> = 1/<em>r</em>, the orbital equation for photons is
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-wald">[3]</a></sup>
+    <sup><a href="#ref-chandrasekhar">[28]</a></sup>:
+</p>
+<div class="eq">
+    (d<em>u</em>/d&phi;)&sup2; = <em>r<sub>s</sub></em> <em>u</em>&sup3; &minus; <em>u</em>&sup2; + 1/<em>b</em>&sup2;
+</div>
+<p>
+    where <em>b</em> is the impact parameter. Differentiating with respect to &phi; yields the second-order ODE:
+</p>
+<div class="eq">
+    d&sup2;<em>u</em>/d&phi;&sup2; = &minus;<em>u</em> + (3/2) <em>r<sub>s</sub></em> <em>u</em>&sup2;
+</div>
+<p>
+    In the simulation's units where <em>r<sub>s</sub></em> = 1, this becomes:
+</p>
+<div class="eq">
+    d&sup2;<em>u</em>/d&phi;&sup2; = &minus;<em>u</em> + 1.5 <em>u</em>&sup2;
+</div>
+<p>
+    This is the <strong>exact Schwarzschild core</strong> implemented in the shader's
+    <code>geodesic_accel()</code> function when the optional spin perturbation is disabled.
+    The first term (&minus;<em>u</em>) corresponds to the Newtonian inverse-square gravity, while the
+    second term (1.5<em>u</em>&sup2;) is the purely relativistic correction responsible for light bending,
+    the existence of the photon sphere, and the black hole shadow.
+</p>
+
+<h3>Key features of this equation</h3>
+<ul>
+    <li><strong>Photon sphere:</strong> Setting the acceleration to zero with d<em>u</em>/d&phi; = 0 gives
+        <em>u</em> = 2/3, i.e., <em>r</em> = 3/2 = 1.5 <em>r<sub>s</sub></em>.
+        This is the unstable circular photon orbit confirmed by analytical solutions
+        <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-wald">[3]</a></sup>.</li>
+    <li><strong>Event horizon:</strong> Capture occurs when <em>u</em> &ge; 1 (i.e., <em>r</em> &le; <em>r<sub>s</sub></em>).
+        The shader enforces this by checking <code>if (u >= 1.0) { shadow_capture = true; }</code>.</li>
+    <li><strong>Weak-field limit:</strong> For <em>u</em> &rarr; 0 (large <em>r</em>), the equation reduces to the
+        Newtonian &minus;<em>u</em>, recovering straight-line propagation.</li>
+</ul>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The underlying orbital equation is <em>exact</em> for photon geodesics in
+    Schwarzschild spacetime. Rendered accuracy still depends on the numerical integrator, step budget,
+    and adaptive stepping used by the shader. The implementation follows the standard Schwarzschild
+    null-geodesic treatment in Misner, Thorne &amp; Wheeler <sup><a href="#ref-mtw">[1]</a></sup>,
+    Wald <sup><a href="#ref-wald">[3]</a></sup>, and Chandrasekhar
+    <sup><a href="#ref-chandrasekhar">[28]</a></sup>.
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. NUMERICAL INTEGRATION -->
+<!-- ============================================================ -->
+
+<h2 id="sec-integration">4. Numerical Integration (Leapfrog &amp; RK4)</h2>
+
+<p>
+    The Binet ODE is a second-order equation integrated as a coupled first-order system:
+</p>
+<div class="eq">
+    d<em>u</em>/d&phi; = <em>v</em> &nbsp;&nbsp;&nbsp;&nbsp;
+    d<em>v</em>/d&phi; = &minus;<em>u</em> + 1.5<em>u</em>&sup2; + <em>f</em><sub>spin</sub>
+</div>
+<p>
+    where <em>v</em> = d<em>u</em>/d&phi; and <em>f</em><sub>spin</sub> is the frame-dragging correction (see <a href="#sec-kerr">Section 5</a>).
+    The same integrators are used for the true Kerr geodesic equations (Section 5.2).
+</p>
+
+<h3>Leapfrog / St&ouml;rmer-Verlet (default)</h3>
+<p>
+    When RK4 is disabled, the simulation uses the <strong>Leapfrog</strong> (St&ouml;rmer-Verlet) method,
+    a <strong>2nd-order</strong> integrator that is symplectic in its fixed-step form:
+</p>
+<pre><code>du += 0.5 * accel(u) * step;   // half-step velocity
+u  += du * step;                // full-step position
+du += 0.5 * accel(u) * step;   // half-step velocity</code></pre>
+<p>
+    With a <strong>fixed step</strong>, Leapfrog is symplectic and avoids the secular energy drift that
+    afflicts non-symplectic methods like plain Euler. In this renderer, however, the same update rule
+    is combined with <strong>adaptive step sizing</strong> (see below), so the strict long-time symplectic
+    guarantee does not apply exactly to the implementation. In practice it still gives a low-cost,
+    stable second-order method that performs well for photons winding near the photon sphere.
+</p>
+
+<h3>Runge-Kutta 4th order (RK4)</h3>
+<p>
+    When enabled, the simulation uses classical RK4
+    <sup><a href="#ref-chandrasekhar">[28]</a></sup>, which is fourth-order accurate, O(&Delta;&phi;&sup4;):
+</p>
+<pre><code>k1 = accel(u)
+k2 = accel(u + 0.5*step*du)
+k3 = accel(u + 0.5*step*(du + 0.5*step*k1))
+k4 = accel(u + step*(du + 0.5*step*k2))
+u  += (step/6)*(du_k1 + 2*du_k2 + 2*du_k3 + du_k4)
+du += (step/6)*(k1 + 2*k2 + 2*k3 + k4)</code></pre>
+<p>
+    RK4 is essential for accurate rendering of higher-order lensing images (photons that
+    complete multiple half-orbits around the photon sphere before escaping). In practice, it reduces
+    integration drift in the strong-lensing regime, although the final image still depends on the
+    available step budget.
+</p>
+
+<h3>Adaptive step sizing</h3>
+<p>
+    The step size &Delta;&phi; is refined near the photon sphere (<em>u</em> &approx; 0.667) using a Gaussian reduction factor:
+</p>
+<div class="eq">
+    step &times;= 1 &minus; 0.7 &middot; exp(&minus;12 (<em>u</em> &minus; 0.667)&sup2;)
+</div>
+<p>
+    This reduces the step by up to 70% when the photon is near the unstable circular orbit,
+    where small numerical errors lead to significant trajectory deviations.
+    Additionally, the step is bounded by a maximum relative change in <em>u</em>,
+    preventing large jumps in regions of rapid curvature change.
+</p>
+
+<!-- ============================================================ -->
+<!-- 5. KERR BLACK HOLE -->
+<!-- ============================================================ -->
+
+<h2 id="sec-kerr">5. Kerr Black Hole &amp; Frame Dragging</h2>
+
+<p>
+    A spinning black hole is described by the <strong>Kerr metric</strong> (1963)
+    <sup><a href="#ref-kerr">[5]</a></sup>, parameterized by the dimensionless spin <em>a</em>/<em>M</em>
+    (0 = Schwarzschild, 1 = maximally spinning). The full Kerr null geodesic equations require
+    the <strong>Carter constant</strong> <sup><a href="#ref-carter">[6]</a></sup> and Boyer-Lindquist
+    coordinate integration, which is computationally expensive for real-time rendering.
+</p>
+
+<h3 id="sec-kerr-perturbative">5.1. Public spin approximation (all exposed modes)</h3>
+<p>
+    For all publicly exposed spin-enabled rendering modes, the simulation keeps the
+    Schwarzschild Binet photon solver and adds a perturbative <strong>frame-dragging correction</strong>:
+</p>
+<div class="eq">
+    d&sup2;<em>u</em>/d&phi;&sup2; = &minus;<em>u</em> + 1.5<em>u</em>&sup2; + <em>a</em> &middot;
+    <em>s</em> &middot; <em>k</em><sub>sq</sub> &middot; 0.8 <em>u</em>&sup3;
+</div>
+<p>
+    where <em>a</em> is the spin parameter, <em>s</em> is the spin alignment factor
+    (dot product of orbital angular momentum with spin axis, ranging from &minus;1 to +1), and
+    <em>k</em><sub>sq</sub> is a user-adjustable heuristic strength parameter ("shadow squeeze").
+    A cumulative azimuthal rotation
+    &Delta;&psi; = <em>a</em>&middot;<em>k</em><sub>sq</sub>&middot;<em>s</em>&middot;&Delta;&phi;&middot;0.85<em>u</em>&sup3;
+    is applied to the 3D ray position about the spin axis.
+    This perturbative spin treatment is applied only in the exterior public lensing path; the
+    dedicated interior pipeline falls back to pure Schwarzschild Binet dynamics so its analytical
+    escape classification remains exact.
+    In the public <code>Fast (Binet lensing)</code> mode, the implementation also applies a small
+    spin-dependent capture-threshold shift to squeeze the shadow boundary. That extra capture rule
+    is an implementation shortcut / visual heuristic, not an exact Kerr critical-curve result.
+    Together these approximations capture qualitative frame-dragging effects but cannot reproduce the exact Kerr shadow boundary.
+</p>
+
+<h3 id="sec-kerr-mino">5.2. True Kerr geodesics (Mino-time formulation)</h3>
+<p>
+    The codebase also contains an <strong>experimental Kerr geodesic integrator</strong> based on the
+    separability discovered by <strong>Carter (1968)</strong>
+    <sup><a href="#ref-carter">[6]</a></sup>.
+    In <strong>Mino time</strong> &sigma; (where d&lambda; = &Sigma; d&sigma;), the geodesic equations
+    separate into independent ODEs in <em>r</em> and <em>&theta;</em>:
+</p>
+<div class="eq">
+    d&sup2;<em>r</em>/d&sigma;&sup2; = R&prime;(<em>r</em>)/2 = 2<em>r</em>P &minus; (<em>r</em> &minus; <em>M</em>)K
+</div>
+<div class="eq">
+    d&sup2;(cos&theta;)/d&sigma;&sup2; = &minus;cos&theta;(&eta; + &xi;&sup2; &minus; <em>a</em>&sup2;) &minus; 2<em>a</em>&sup2;cos&sup3;&theta;
+</div>
+<div class="eq">
+    d&phi;/d&sigma; = <em>a</em>P/&Delta; + &xi;/sin&sup2;&theta; &minus; <em>a</em>
+</div>
+<p>where:</p>
+<ul>
+    <li>P = <em>r</em>&sup2; + <em>a</em>&sup2; &minus; <em>a</em>&xi;</li>
+    <li>K = (&xi; &minus; <em>a</em>)&sup2; + &eta;</li>
+    <li>&Delta; = <em>r</em>&sup2; &minus; 2<em>Mr</em> + <em>a</em>&sup2;</li>
+    <li>&xi; = <em>L<sub>z</sub></em>/<em>E</em> (angular momentum), &eta; = <em>Q</em>/<em>E</em>&sup2; (Carter constant)</li>
+</ul>
+<p>
+    The radial and polar equations are <strong>polynomial in <em>r</em> and cos&theta;</strong>,
+    while the azimuthal equation remains rational through
+    &Delta; and sin&sup2;&theta;; taken together they are still computationally cheap per step.
+    The constants &xi; and &eta;
+    are currently initialized from the camera ray direction using flat-space expressions
+    and then projected onto the Kerr constraint surface
+    (d<em>r</em>/d&sigma;)&sup2; = R(<em>r</em>). That makes this a promising exact-equation solver,
+    but not a validated user-facing Kerr rendering mode in its current state.
+</p>
+<p>
+    The 3D Cartesian position is reconstructed at each step from Boyer-Lindquist coordinates:
+    <em>x</em> = &radic;(<em>r</em>&sup2; + <em>a</em>&sup2;)&thinsp;sin&theta;&thinsp;cos&phi;,
+    <em>y</em> = &radic;(<em>r</em>&sup2; + <em>a</em>&sup2;)&thinsp;sin&theta;&thinsp;sin&phi;,
+    <em>z</em> = <em>r</em>&thinsp;cos&theta;.
+    Event-horizon capture uses the analytical
+    Kerr outer horizon <em>r</em><sub>+</sub> = <em>M</em> + &radic;(<em>M</em>&sup2; &minus; <em>a</em>&sup2;)
+    with a small numerical buffer in the current implementation.
+</p>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The separated Mino-time equations themselves are the exact Kerr null-geodesic
+    equations <sup><a href="#ref-carter">[6]</a></sup> <sup><a href="#ref-chandrasekhar">[28]</a></sup>.
+    In this repository, however, the feature remains experimental and is not presented as a validated
+    public rendering mode.
+    <br><br>
+    <strong>Current status:</strong> This integrator is <strong>work-in-progress</strong> and is not
+    yet exposed in the user interface. All user-facing modes currently use the same approximate Binet
+    photon solver described in Section 5.1. The "Kerr-inspired disk velocities" mode uses
+    Kerr equatorial angular velocity to drive disk matter but does not change the photon geodesic solver.
+</div>
+
+<!-- ============================================================ -->
+<!-- 6. ISCO -->
+<!-- ============================================================ -->
+
+<h2 id="sec-isco">6. ISCO: Innermost Stable Circular Orbit</h2>
+
+<p>
+    The ISCO marks the inner edge of a stable accretion disk. Matter inside the ISCO plunges
+    rapidly into the black hole. The ISCO radius depends on the black hole spin and was derived by
+    <strong>Bardeen, Press &amp; Teukolsky (1972)</strong> <sup><a href="#ref-bpt">[8]</a></sup>:
+</p>
+<div class="eq">
+    <em>r</em><sub>ISCO</sub> = <em>r<sub>g</sub></em> (3 + <em>Z</em><sub>2</sub> &mp;
+    &radic;[(3 &minus; <em>Z</em><sub>1</sub>)(3 + <em>Z</em><sub>1</sub> + 2<em>Z</em><sub>2</sub>)])
+</div>
+<p>where:</p>
+<div class="eq">
+    <em>Z</em><sub>1</sub> = 1 + (1 &minus; &chi;&sup2;)<sup>1/3</sup>
+    [(1 + &chi;)<sup>1/3</sup> + (1 &minus; &chi;)<sup>1/3</sup>]
+    <br>
+    <em>Z</em><sub>2</sub> = &radic;(3&chi;&sup2; + <em>Z</em><sub>1</sub>&sup2;)
+</div>
+<p>
+    with &chi; = <em>a</em>/<em>M</em> the dimensionless spin parameter, and &minus; for prograde,
+    + for retrograde orbits. In the code, this is implemented in the <code>calculateISCO()</code>
+    function in <code>js/app/core/renderer.js</code>. In the current UI, the sign of
+    <em>a</em>/<em>M</em> is used to mirror the black hole's spin direction, while the disk model
+    stays on the co-rotating branch; a separate retrograde-disk toggle is not exposed.
+    The implementation converts from gravitational radii
+    (<em>r<sub>g</sub></em> = <em>GM</em>/<em>c</em>&sup2;) to Schwarzschild radii
+    (<em>r<sub>s</sub></em> = 2<em>r<sub>g</sub></em>) with the factor 0.5.
+</p>
+
+<table>
+    <tr><th>Spin <em>a</em>/<em>M</em></th><th>ISCO (prograde) in <em>r<sub>s</sub></em></th><th>ISCO (retrograde) in <em>r<sub>s</sub></em></th></tr>
+    <tr><td>0 (Schwarzschild)</td><td>3.0</td><td>3.0</td></tr>
+    <tr><td>0.5</td><td>2.18</td><td>3.65</td></tr>
+    <tr><td>0.9</td><td>1.16</td><td>4.18</td></tr>
+    <tr><td>0.998 (near-extremal)</td><td>0.62</td><td>4.47</td></tr>
+    <tr><td>1.0 (extremal limit)</td><td>0.5</td><td>4.5</td></tr>
+</table>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The Bardeen-Press-Teukolsky ISCO formula is <em>exact</em> for equatorial circular
+    orbits in Kerr spacetime. The simulation's implementation faithfully follows this formula
+    <sup><a href="#ref-bpt">[8]</a></sup>.
+</div>
+
+<!-- ============================================================ -->
+<!-- 7. ACCRETION DISK MODELS -->
+<!-- ============================================================ -->
+
+<h2 id="sec-accretion">7. Accretion Disk Models</h2>
+
+<p>
+    The simulation offers three accretion disk models, each appropriate for different astrophysical regimes:
+</p>
+
+<!-- 7.1 Thin Disk -->
+<h3 id="sec-thin-disk">7.1. Thin Disk (Shakura–Sunyaev-Type Profile with Kerr ISCO Inner Edge)</h3>
+
+<p>
+    This is the default mode, modeling a geometrically thin, optically thick accretion disk
+    appropriate for <strong>luminous AGN (quasars)</strong> and <strong>stellar-mass X-ray binaries</strong>
+    accreting below the Eddington limit.
+</p>
+
+<h4>Temperature profile</h4>
+<p>
+    The surface temperature follows the familiar <strong>zero-torque thin-disk proxy</strong>
+    used in the <strong>Shakura &amp; Sunyaev (1973)</strong>
+    <sup><a href="#ref-ss73">[10]</a></sup> treatment and in the Newtonian-limit form often used
+    as a visual stand-in for <strong>Novikov &amp; Thorne (1973)</strong>
+    <sup><a href="#ref-nt73">[11]</a></sup>:
+</p>
+<div class="eq">
+    <em>T</em>(<em>r</em>) = <em>T</em><sub>0</sub> &middot; <em>x</em><sup>&minus;3/4</sup>
+    &middot; (1 &minus; &radic;(1/<em>x</em>))<sup>1/4</sup>
+</div>
+<p>
+    where <em>x</em> = <em>r</em>/<em>r</em><sub>in</sub> and <em>r</em><sub>in</sub> is the ISCO radius.
+    In this renderer, the <strong>inner edge</strong> tracks the Kerr ISCO, but the
+    <strong>flux profile itself is not the full spin-dependent Novikov-Thorne/Page-Thorne relativistic correction</strong>.
+    It is the simpler Shakura-Sunyaev-style zero-torque profile:
+</p>
+<ul>
+    <li>Gravitational energy release (viscous dissipation) &propto; <em>r</em><sup>&minus;3</sup></li>
+    <li>Zero-torque boundary condition at the ISCO: the factor (1 &minus; &radic;(<em>r</em><sub>in</sub>/<em>r</em>))</li>
+    <li>Stefan-Boltzmann law: <em>F</em> = &sigma;<em>T</em><sup>4</sup> &rArr; <em>T</em> &propto; <em>F</em><sup>1/4</sup></li>
+</ul>
+
+<h4>Flux profile</h4>
+<p>
+    The radiated flux (energy per unit area per unit time):
+</p>
+<div class="eq">
+    <em>F</em>(<em>r</em>) &propto; (1/<em>x</em>&sup3;) &middot; (1 &minus; &radic;(1/<em>x</em>))
+</div>
+<p>
+    This simple zero-torque profile peaks at
+    <em>r</em> = (49/36) <em>r</em><sub>in</sub> &approx; 1.36 <em>r</em><sub>in</sub>.
+    The code applies a normalization factor of 18.0 for visual brightness scaling.
+</p>
+
+<h4>Disk velocity</h4>
+<p>
+    Matter in the thin disk follows <strong>Keplerian circular orbits</strong>. In the Schwarzschild
+    case, the renderer uses the familiar local orbital speed:
+</p>
+<div class="eq">
+    <em>v</em><sub>&phi;</sub> = 1 / &radic;(2(<em>r</em> &minus; 1))
+</div>
+<p>
+    This is the local azimuthal speed relative to a static Schwarzschild frame.
+    It approaches <em>c</em> as <em>r</em> &rarr; 1.5 (the photon sphere) and goes as
+    1/&radic;(2<em>r</em>) at large distances, recovering the Newtonian Keplerian limit
+    <em>v</em> &propto; 1/&radic;<em>r</em>.
+</p>
+<p>
+    In the Kerr-inspired disk-velocity mode, the code first uses the standard equatorial Kerr
+    angular velocity:
+</p>
+<div class="eq">
+    &Omega; = 1 / (<em>r</em><sub><em>g</em></sub><sup>3/2</sup> + <em>a</em>)
+</div>
+<p>
+    where <em>r<sub>g</sub></em> = 2<em>r</em> (converting from <em>r<sub>s</sub></em> to gravitational radii).
+    This is the standard Kerr equatorial Keplerian angular velocity
+    <sup><a href="#ref-bpt">[8]</a></sup>. The renderer then converts this to a flat-space azimuthal
+    speed for Doppler/beaming calculations. That captures the leading spin dependence, but it is not
+    a full local-tetrad Kerr velocity treatment. With the current UI's sign convention, negative
+    <em>a</em>/<em>M</em> values mirror the spin direction and the co-rotating disk velocity sign;
+    a separate retrograde-disk branch is not exposed.
+</p>
+
+<h4>Limb darkening</h4>
+<p>
+    The thin disk emission includes <strong>Eddington limb darkening</strong>,
+    which accounts for the angle-dependent intensity of an optically thick atmosphere:
+</p>
+<div class="eq">
+    <em>I</em>(&mu;) = <em>I</em>(1) &middot; (2/5 + 3/5 &middot; &mu;)
+</div>
+<p>
+    where &mu; = cos&thinsp;&theta;<sub>emission</sub> is the cosine of the angle between the
+    emitted photon and the disk normal (z-axis). This reduces the brightness of disk regions
+    viewed at grazing angles, which is particularly visible for the underside of the disk
+    seen through gravitational lensing.
+</p>
+
+<h4>Sub-step disk crossing detection</h4>
+<p>
+    Near the photon sphere (<em>r</em> &asymp; 1.5 <em>r<sub>s</sub></em>), photon paths wind tightly and a single
+    integration step can skip over the <em>z</em> = 0 equatorial plane. To reliably capture
+    <strong>secondary and tertiary Einstein rings</strong>, the disk-crossing test is subdivided
+    into 4 sub-checks when the photon is close to the photon sphere and the step subtends
+    a large angle. This ensures that higher-order lensed images of the disk are not missed
+    by the finite step size.
+</p>
+
+<h4>Turbulence</h4>
+<p>
+    The disk surface displays procedural turbulence using <strong>fractional Brownian motion (fBm)</strong>
+    noise layered over spiral arm structures. This is purely artistic — real disk turbulence arises from
+    the <strong>magnetorotational instability (MRI)</strong> <sup><a href="#ref-balbus">[12]</a></sup>
+    and requires full 3D magnetohydrodynamic (MHD) simulations to model accurately.
+    However, the visual character (filamentary, multi-scale structure) is qualitatively reasonable.
+</p>
+
+<!-- 7.2 Thick Torus -->
+<h3 id="sec-thick-torus">7.2. Thick Torus (ADAF/RIAF)</h3>
+
+<p>
+    This mode models an <strong>advection-dominated accretion flow (ADAF)</strong>
+    <sup><a href="#ref-narayan94">[13]</a></sup>, also known as a
+    <strong>radiatively inefficient accretion flow (RIAF)</strong>.
+    This is appropriate for <strong>low-luminosity AGN</strong> like <strong>M87*</strong> and
+    <strong>Sgr&nbsp;A*</strong> — the two targets imaged by the Event Horizon Telescope (EHT)
+    <sup><a href="#ref-eht">[14]</a></sup>.
+</p>
+
+<h4>Geometry</h4>
+<p>
+    The torus has a configurable center radius <em>r</em><sub>0</sub> and aspect ratio <em>H</em>/<em>R</em>.
+    The vertical density profile follows a <strong>Gaussian</strong>, motivated by
+    hydrostatic equilibrium in a vertically isothermal atmosphere:
+</p>
+<div class="eq">
+    &rho;(<em>R</em>, <em>z</em>) &propto; exp(&minus;<em>z</em>&sup2; / 2<em>H</em>&sup2;)
+</div>
+
+<h4>Emissivity</h4>
+<p>
+    The radial emissivity uses a hybrid model combining a <strong>configurable power-law decay</strong>
+    with a <strong>Gaussian torus profile</strong> centered at <em>r</em><sub>0</sub>.
+    The self-similar ADAF solution of <strong>Narayan &amp; Yi (1994)</strong>
+    <sup><a href="#ref-narayan94">[13]</a></sup> predicts:
+</p>
+<ul>
+    <li>Density: <em>n</em> &propto; <em>r</em><sup>&minus;3/2</sup></li>
+    <li>Temperature: <em>T</em> &propto; <em>r</em><sup>&minus;1</sup></li>
+    <li>Bremsstrahlung emissivity: <em>j<sub>ff</sub></em> &propto; <em>n</em>&sup2; <em>T</em><sup>1/2</sup>
+        &propto; <em>r</em><sup>&minus;&beta;</sup></li>
+</ul>
+<p>
+    The power-law index &beta; ("radial falloff") is <strong>user-configurable</strong>
+    (default 2.5, range 0.5&ndash;5.0). The pure Narayan &amp; Yi value is &beta; = 3.5,
+    but GRMHD simulations show values typically in the range 2&ndash;4 depending on
+    magnetic field topology and heating prescriptions.
+    The emissivity is blended 50/50 with a Gaussian profile
+    exp(&minus;1.2 ((<em>r</em>&minus;<em>r</em><sub>0</sub>)/(0.6<em>r</em><sub>0</sub>))&sup2;)
+    to produce a visually defined torus ring rather than a centrally-concentrated blob.
+    Inside <em>r</em><sub>0</sub>, the falloff exponent is reduced to 0.6&beta; to prevent
+    excessive brightening toward the center.
+</p>
+
+<h4>Opacity</h4>
+<p>
+    The absorption coefficient is <strong>user-configurable</strong> (default 0.015, range 0.001&ndash;0.15).
+    ADAFs are optically thin to bremsstrahlung radiation, so the default is low. Higher values
+    produce a more opaque, surface-like torus; lower values let more emission accumulate along
+    the line of sight through the volume.
+</p>
+
+<h4>Outer extent</h4>
+<p>
+    The torus outer edge is set by a <strong>configurable multiplier</strong> (default 3.5&times;)
+    relative to <em>r</em><sub>0</sub>, with a smooth falloff. This controls how far
+    the accretion flow extends radially.
+</p>
+
+<h4>Electron temperature</h4>
+<p>
+    The two-temperature ADAF model (<strong>Narayan &amp; Yi 1995</strong> <sup><a href="#ref-narayan95">[15]</a></sup>;
+    <strong>Esin et al. 1997</strong> <sup><a href="#ref-esin">[16]</a></sup>) predicts
+    <em>T</em><sub>e</sub> &propto; <em>r</em><sup>&minus;0.5</sup>:
+</p>
+<div class="eq">
+    <em>T</em>(<em>r</em>) = <em>T</em><sub>0</sub> &middot; (<em>r</em><sub>0</sub>/<em>r</em>)<sup>0.5</sup>
+</div>
+
+<h4>Gas velocity</h4>
+<p>
+    ADAF gas orbits at roughly 50% of the Keplerian velocity (sub-Keplerian due to significant
+    radial pressure support), consistent with ADAF theory
+    <sup><a href="#ref-narayan94">[13]</a></sup>.
+</p>
+
+<!-- 7.3 Slim Disk -->
+<h3 id="sec-slim-disk">7.3. Slim Disk (Super-Eddington)</h3>
+
+<p>
+    The slim disk model represents <strong>super-Eddington accretion</strong>, where the accretion rate
+    exceeds the critical value at which radiation pressure balances gravity. Key features:
+</p>
+<ul>
+    <li><strong>Geometrically thicker</strong> than the thin disk near the ISCO due to radiation pressure puffing.</li>
+    <li><strong>Extends inside the ISCO</strong>: matter continues to radiate in the plunging region, unlike
+        the thin disk which has zero emission inside <em>r</em><sub>ISCO</sub>.</li>
+    <li><strong>Advection-dominated near ISCO:</strong> inside the ISCO, <em>T</em> &propto; <em>r</em><sup>&minus;0.5</sup>
+        (advection-dominated, similar to ADAF behavior).</li>
+</ul>
+<p>
+    This mode is appropriate for <strong>ultraluminous X-ray sources (ULXs)</strong> and
+    <strong>narrow-line Seyfert 1 galaxies</strong>.
+</p>
+
+<h4>Configurable parameters</h4>
+<p>
+    Three user-adjustable parameters control the slim disk appearance:
+</p>
+<ul>
+    <li><strong>H/R ratio</strong> (default 0.15, range 0.05&ndash;0.5): The base height-to-radius ratio
+        of the disk. Higher values produce a geometrically thicker flow. The canonical slim-disk
+        H/R is 0.1&ndash;0.3 depending on the accretion rate.</li>
+    <li><strong>Opacity</strong> (default 0.6, range 0.1&ndash;2.0): The absorption coefficient controlling
+        how opaque/surface-like the disk appears. Higher values produce a sharper photosphere;
+        lower values give a more volumetric, translucent appearance.</li>
+    <li><strong>ISCO puff factor</strong> (default 2.5, range 0&ndash;6): Controls how much the disk
+        thickens near and inside the ISCO due to radiation pressure. The disk height at
+        radius <em>r</em> is:
+        <div class="eq">
+            <em>H</em>(<em>r</em>) = <em>r</em> &middot; (H/R) &middot; (1 + <em>f</em><sub>puff</sub> &middot; exp(&minus;1.5 max(<em>r</em> &minus; <em>r</em><sub>ISCO</sub>, 0)))
+        </div>
+        where <em>f</em><sub>puff</sub> is the puff factor. Setting it to 0 gives a constant H/R;
+        higher values produce the characteristic radiation-pressure "puffing" expected in
+        super-Eddington flows.</li>
+</ul>
+
+<!-- 7.4 Self-Irradiation -->
+<h3 id="sec-self-irradiation">7.4. Disk Self-Irradiation (Returning Radiation)</h3>
+
+<p>
+    An important relativistic correction incorporated into both the thin and slim disk models is 
+    <strong>returning radiation</strong>. Light emitted from the inner regions of the accretion disk 
+    (near the ISCO) does not always escape to infinity. Because of the strong gravitational lensing 
+    near the black hole, a significant fraction of the emitted flux is bent back and strikes the disk 
+    again, depositing its energy back into the plasma
+    <sup><a href="#ref-cunningham">[45]</a></sup>.
+</p>
+<p>
+    In this renderer, returning radiation is represented by a <strong>heuristic, Cunningham-inspired
+    inner-disk enhancement</strong>, not by recursive ray tracing or a calibrated transfer-function
+    evaluation. The boost is made stronger for higher spin and is forced to decay rapidly outward
+    as <em>r</em><sup>&minus;3.5</sup>, so the visual effect remains concentrated near the ISCO. By the
+    Stefan-Boltzmann law, the effective display temperature is then raised by the fourth root of
+    this enhancement factor. This produces a plausible extra brightening of the inner disk, but it
+    should be read as a visualization proxy rather than a quantitative returning-radiation result.
+</p>
+
+<!-- ============================================================ -->
+<!-- 8. BLACK-BODY RADIATION -->
+<!-- ============================================================ -->
+
+<h2 id="sec-blackbody">8. Black-Body Radiation &amp; Spectrum</h2>
+
+<p>
+    The accretion disk's thermal emission is modeled as <strong>black-body (Planck) radiation</strong>.
+    At each point on the disk, the local temperature determines the emitted spectrum via Planck's law:
+</p>
+<div class="eq">
+    <em>B</em><sub>&nu;</sub>(<em>T</em>) = (2<em>h</em>&nu;&sup3;/<em>c</em>&sup2;) / (exp(<em>h</em>&nu;/<em>kT</em>) &minus; 1)
+</div>
+<p>
+    Rather than evaluating this integral at runtime, the simulation uses a <strong>precomputed spectrum
+    lookup texture</strong> (<code>spectra.png</code>):
+</p>
+<ul>
+    <li>One row maps temperature &rarr; RGB color (black-body chromaticity).</li>
+    <li>Another row maps wavelength &rarr; RGB for monochromatic lines (e.g., H&alpha; at 656.28 nm).</li>
+    <li>A third row enables inverse temperature lookup from spectral ratios, used for
+        Doppler-shifting the Milky Way background.</li>
+</ul>
+<p>
+    The disk temperature range spans <strong>4,500 K</strong> (reddish-orange, like a cool K-type star)
+    to <strong>30,000 K</strong> (blue-white, like an O-type star). In this renderer these values should
+    be read as <strong>effective display-side color temperatures</strong>, not as mass-scaled physical
+    inner-disk temperatures; real stellar-mass accretion disks can peak far into the UV/X-ray.
+</p>
+
+<!-- ============================================================ -->
+<!-- 9. GRAVITATIONAL REDSHIFT -->
+<!-- ============================================================ -->
+
+<h2 id="sec-grav-redshift">9. Gravitational Redshift</h2>
+
+<p>
+    Photons climbing out of a gravitational potential well lose energy. The gravitational redshift
+    between an emission radius <em>r<sub>e</sub></em> and an observer at <em>r<sub>o</sub></em> in
+    Schwarzschild spacetime is <sup><a href="#ref-mtw">[1]</a></sup>:
+</p>
+<div class="eq">
+    1 + <em>z</em> = &radic;[(1 &minus; <em>r<sub>s</sub></em>/<em>r<sub>o</sub></em>) /
+    (1 &minus; <em>r<sub>s</sub></em>/<em>r<sub>e</sub></em>)]
+</div>
+<p>
+    In the simulation's units (<em>r<sub>s</sub></em> = 1):
+</p>
+<div class="eq">
+    <em>g</em>(<em>r<sub>e</sub></em>) = &radic;[(1 &minus; 1/<em>r<sub>e</sub></em>) / (1 &minus; 1/<em>r<sub>o</sub></em>)]
+</div>
+<p>
+    This factor is applied as a multiplicative shift to the effective temperature:
+    <em>T</em><sub>obs</sub> = <em>T</em><sub>emit</sub> &middot; <em>g</em>.
+    For a full Planck spectrum, the identity
+    <em>B<sub>&nu;</sub></em>(<em>DT</em>) = <em>D</em>&sup3; <em>B<sub>&nu;/D</sub></em>(<em>T</em>)
+    means a temperature rescaling would encode both frequency shift and specific-intensity scaling.
+    In this renderer, however, the lookup texture stores <strong>chromaticity</strong> rather than
+    absolute Planck radiance, so the hue shift and the explicit <em>D</em>&sup3; brightness factor
+    are handled separately (see Section 11).
+</p>
+
+<h3>Implementation note</h3>
+<p>
+    The renderer applies the <strong>static Schwarzschild redshift factor</strong>
+    &radic;[(1 &minus; 1/<em>r<sub>e</sub></em>) / (1 &minus; 1/<em>r<sub>o</sub></em>)]
+    to the source temperature first, then applies a separate special-relativistic transfer factor
+    for moving emitters:
+</p>
+<div class="eq">
+    <em>f</em><sub>transfer</sub> = &gamma;(1 + <b>v</b> &middot; <b>n̂</b>)
+</div>
+<p>
+    This factorization keeps the static gravitational piece and the local kinematic piece separate,
+    so the transverse time-dilation part encoded in &gamma; is not counted twice. It is still a
+    <strong>local-frame approximation</strong>, not a full invariant GR transfer calculation built from
+    emitter tetrads and constants of motion, so the thin disk is most faithful in the
+    non-spinning Schwarzschild limit and becomes progressively more approximate in plunging,
+    volumetric, and Kerr-inspired modes.
+</p>
+<div class="comparison">
+    <strong>Accuracy:</strong> The static Schwarzschild redshift law is exact for stationary emitters.
+    Combined with the separate SR Doppler factor it gives a consistent local approximation for moving
+    emitters in this renderer, but it is not a full GR redshift treatment for arbitrary source motion.
+</div>
+
+<!-- ============================================================ -->
+<!-- 10. RELATIVISTIC DOPPLER EFFECT -->
+<!-- ============================================================ -->
+
+<h2 id="sec-doppler">10. Relativistic Doppler Effect</h2>
+
+<p>
+    Moving matter in the accretion disk introduces a Doppler shift. The local
+    special-relativistic Doppler factor used for emitter or observer motion is
+    <sup><a href="#ref-rindler">[17]</a></sup>:
+</p>
+<div class="eq">
+    <em>D</em> = 1 / [&gamma;(1 + <b>v</b> &middot; <b>n̂</b>)]
+</div>
+<p>
+    where &gamma; = 1/&radic;(1 &minus; <em>v</em>&sup2;) is the Lorentz factor, <b>v</b> is the emitter's
+    velocity, and <b>n̂</b> is the photon direction at the emission point.
+</p>
+<p>
+    In the simulation, the kinematic transfer factor along a ray is:
+</p>
+<div class="eq">
+    <em>f</em><sub>transfer</sub> = 1/<em>D</em><sub>observer</sub> &middot; 1/<em>D</em><sub>emitter</sub>
+    = &gamma;<sub>obs</sub>(1 + <b>v</b><sub>obs</sub> &middot; <b>n̂</b>)
+    &middot; &gamma;<sub>emit</sub>(1 + <b>v</b><sub>emit</sub> &middot; <b>n̂</b>)
+</div>
+<p>
+    The static gravitational redshift factor from <a href="#sec-grav-redshift">Section 9</a>
+    is applied separately.
+</p>
+<p>
+    This factor is applied to the disk temperature: <em>T</em><sub>obs</sub> = <em>T</em><sub>emit</sub> /
+    <em>f</em><sub>transfer</sub>. A blueshift (<em>f</em> &lt; 1) raises the observed temperature (approaching
+    side), while a redshift (<em>f</em> &gt; 1) lowers it (receding side). This creates the characteristic
+    <strong>left-right brightness asymmetry</strong> in the disk image.
+</p>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The relativistic Doppler formula itself is exact. The blue/red asymmetry in the
+    accretion disk is one of the most prominent observational signatures, confirmed theoretically
+    by Luminet (1979) <sup><a href="#ref-luminet">[18]</a></sup> and computationally by the
+    <em>Interstellar</em> team (James et al. 2015) <sup><a href="#ref-interstellar">[19]</a></sup>.
+    In the renderer, extreme transfer factors are guarded by minimum/maximum clamps for numerical
+    stability, so the implementation should be read as exact only until those guardrails activate.
+</div>
+
+<!-- ============================================================ -->
+<!-- 11. RELATIVISTIC BEAMING -->
+<!-- ============================================================ -->
+
+<h2 id="sec-beaming">11. Relativistic Beaming &amp; Liouville's Theorem</h2>
+
+<p>
+    Beyond the color/temperature shift, relativistic motion also changes the observed <strong>intensity</strong>
+    of radiation. For thermal emitters and the background-sky proxy, the simulation offers two beaming modes.
+    Jets use a separate synchrotron beaming law described in Section 15.
+</p>
+
+<h3>Physical beaming (D&sup3; Liouville)</h3>
+<p>
+    From Liouville's theorem in phase space, the quantity <em>I<sub>&nu;</sub></em>/&nu;&sup3; is a
+    Lorentz invariant along a photon's path <sup><a href="#ref-rybicki">[20]</a></sup>. For a black-body source,
+    this means:
+</p>
+<div class="eq">
+    <em>I</em><sub>obs</sub> = <em>D</em>&sup3; <em>I</em><sub>emit</sub>
+</div>
+<p>
+    where <em>D</em> is the Doppler factor. Although the Planck function satisfies
+    <em>B</em><sub>&nu;</sub>(<em>DT</em>) = <em>D</em>&sup3; <em>B</em><sub>&nu;/D</sub>(<em>T</em>),
+    the simulation's spectrum texture stores <strong>chromaticity</strong> (normalized color) rather than
+    full Planck intensities. Therefore the temperature shift <em>T</em> &rarr; <em>DT</em> only changes
+    the observed <em>hue</em>, not the brightness. The <em>D</em>&sup3; intensity factor must be &mdash;
+    and is &mdash; applied explicitly to the emitted intensity.
+</p>
+<p>
+    In the current implementation, this explicit intensity factor is applied consistently to
+    all thermal emitters that use the black-body lookup (thin disk, thick torus, slim disk,
+    and planet illumination) and to the background-sky proxy in physical mode. The jet branches
+    keep their own synchrotron beaming law rather than using the D<sup>3</sup>/cinematic black-body toggle.
+</p>
+<p>
+    For numerical stability, several shading paths clamp extreme transfer factors before applying
+    the thermal D<sup>3</sup> correction, and the background-sky boost is capped at a large finite value.
+    In cinematic mode, the background uses the same softened observer-frame beaming curve as the rest
+    of the non-physical path. These are implementation guardrails / presentation choices, not changes
+    to the underlying exact transfer law.
+</p>
+
+<h3>Cinematic beaming</h3>
+<p>
+    For artistic rendering (similar to the <em>Interstellar</em> movie visualization), the simulation
+    offers a softened beaming model:
+</p>
+<div class="eq">
+    <em>I</em><sub>obs</sub> &propto; <em>D</em><sup>~2.15</sup> <em>I</em><sub>emit</sub>
+    <br>(with <em>D</em> clamped to [0.62, 1.48])
+</div>
+<p>
+    This reduces the dramatic brightness contrast between the approaching and receding sides of the disk,
+    making it visually more balanced. The <em>Interstellar</em> team
+    <sup><a href="#ref-interstellar">[19]</a></sup> similarly reduced the beaming in their renderings to
+    keep the full disk visible.
+</p>
+
+<!-- ============================================================ -->
+<!-- 12. RELATIVISTIC ABERRATION -->
+<!-- ============================================================ -->
+
+<h2 id="sec-aberration">12. Relativistic Aberration</h2>
+
+<p>
+    A moving observer perceives incoming light from different apparent directions compared to a stationary
+    observer. This <strong>relativistic aberration</strong> is implemented using the
+    <strong>Lorentz velocity transformation of light directions</strong>:
+</p>
+<div class="eq">
+    <b>n'</b> = [(<b>n</b><sub>&parallel;</sub> + <em>v</em>) + <b>n</b><sub>&perp;</sub>/&gamma;] /
+    (1 + <b>v</b> &middot; <b>n</b>)
+</div>
+<p>
+    where <b>n</b> is the original ray direction and <b>v</b> is the observer's velocity. This is the
+    standard <strong>relativistic velocity addition formula</strong> applied to light
+    <sup><a href="#ref-rindler">[17]</a></sup>.
+</p>
+<p>
+    The effect concentrates starlight toward the direction of motion (headlight effect) and spreads it
+    away from the rear. The simulation applies this transformation to each ray before tracing.
+</p>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The aberration formula is exact for special relativity.
+    It correctly produces the relativistic "searchlight" concentration of background stars
+    toward the observer's direction of motion.
+</div>
+
+<!-- ============================================================ -->
+<!-- 13. OBSERVER KINEMATICS -->
+<!-- ============================================================ -->
+
+<h2 id="sec-observer">13. Observer Kinematics &amp; Time Dilation</h2>
+
+<h3>Circular orbit</h3>
+<p>
+    When orbital motion is enabled, the observer follows a circular Schwarzschild orbit model at radius
+    <em>r</em>. The public motion controls clamp this mode to <em>r</em> &ge; 3 <em>r<sub>s</sub></em> so it
+    stays in the <strong>stable massive-particle regime</strong>. The analytic relations below extend
+    formally into the unstable band 1.5 <em>r<sub>s</sub></em> &lt; <em>r</em> &lt; 3 <em>r<sub>s</sub></em>,
+    with <em>r</em> = 1.5 <em>r<sub>s</sub></em> corresponding to the photon sphere.
+</p>
+<div class="eq">
+    <em>v</em> = 1 / &radic;(2(<em>r</em> &minus; 1))
+</div>
+<p>
+    and the coordinate angular velocity:
+</p>
+<div class="eq">
+    &Omega; = <em>v</em> &middot; &radic;(1 &minus; 1/<em>r</em>) / <em>r</em>
+</div>
+
+<h3>Time dilation</h3>
+<p>
+    The relevant Schwarzschild <strong>proper-time relations</strong> are:
+</p>
+<ul>
+    <li><strong>Circular orbit:</strong>
+        d&tau;/d<em>t</em> = &radic;(1 &minus; 3/(2<em>r</em>))
+        <br>This combines the gravitational factor &radic;(1 &minus; 1/<em>r</em>) with the kinematic
+        factor 1/&gamma;, and for a Schwarzschild circular orbit these combine to give
+        &radic;(1 &minus; 3<em>M</em>/<em>r</em>) = &radic;(1 &minus; 3/(2<em>r</em>))
+        <sup><a href="#ref-mtw">[1]</a></sup>.
+    </li>
+    <li><strong>Stationary observer:</strong>
+        d&tau;/d<em>t</em> = &radic;(1 &minus; 1/<em>r</em>)
+        <br>(pure gravitational time dilation).
+    </li>
+</ul>
+
+<div class="comparison">
+    <strong>Implementation note:</strong> These formulae are exact Schwarzschild relations.
+    In the code, the orbit and hover modes advance <code>observer.time</code> using the
+    <em>inverse</em> of these factors so the distant scene evolves at the appropriate relative rate
+    as seen by the local observer. The dedicated free-fall dive mode handles its own time update
+    separately, and the Kerr-inspired disk-velocity mode does not promote the observer kinematics
+    to a full Kerr treatment.
+</div>
+
+<!-- ============================================================ -->
+<!-- 14. GRAVITATIONAL BLUESHIFT & HOVERING OBSERVER -->
+<!-- ============================================================ -->
+
+<h2 id="sec-blueshift">14. Gravitational Blueshift &amp; Hovering Observer</h2>
+
+<p>
+    One of the most vivid consequences of General Relativity is the <strong>gravitational blueshift</strong>
+    of light falling into a gravitational potential well.  When a photon travels from a weaker
+    gravitational field (far from the black hole) to a stronger one (near the horizon), it gains
+    energy.  Since light always travels at <em>c</em>, this energy gain manifests as an increase in
+    frequency — a blueshift toward the violet and beyond.
+</p>
+
+<p>
+    The strength of the effect depends critically on <em>how</em> the observer moves: a
+    <strong>hovering</strong> (stationary) observer sees the full gravitational blueshift, while a
+    <strong>free-falling</strong> observer's kinematic Doppler redshift cancels and overpowers the
+    gravitational contribution.
+</p>
+
+<h3 id="sec-blueshift-static">14.1 Static (Hovering) Observer</h3>
+
+<p>
+    A static observer at Schwarzschild radius <em>r</em> fires thrusters to remain at rest in the
+    gravitational field.  For a photon emitted at infinity and received at <em>r</em>, the
+    frequency ratio is given by the Schwarzschild metric time component:
+</p>
+<div class="eq">
+    <em>f</em><sub>obs</sub> / <em>f</em><sub>emit</sub> = 1 / &radic;(1 &minus; <em>r<sub>s</sub></em>/<em>r</em>)
+</div>
+<p>
+    In the simulation's units (<em>r<sub>s</sub></em> = 1):
+</p>
+<div class="eq">
+    <em>f</em><sub>obs</sub> / <em>f</em><sub>emit</sub> = 1 / &radic;(1 &minus; 1/<em>r</em>)
+</div>
+<p>
+    This diverges as <em>r</em> &rarr; <em>r<sub>s</sub></em>: a hovering observer infinitesimally close to the
+    event horizon would see all incoming radiation infinitely blueshifted — visible starlight would
+    be boosted past ultraviolet into X-rays and gamma rays.  In practice, hovering at the horizon
+    requires infinite proper acceleration:
+</p>
+<div class="eq">
+    <em>a</em> = <em>M</em> / (<em>r</em>&sup2; &radic;(1 &minus; <em>r<sub>s</sub></em>/<em>r</em>))
+</div>
+<p>
+    so the simulation limits the minimum hover radius to <em>r</em> = 1.0002 <em>r<sub>s</sub></em>.
+</p>
+
+<h4>Temperature and intensity shift</h4>
+<p>
+    For black-body sources (stars in the background sky), the observed colour temperature is:
+</p>
+<div class="eq">
+    <em>T</em><sub>obs</sub> = <em>T</em><sub>emit</sub> / &radic;(1 &minus; 1/<em>r</em>)
+</div>
+<p>
+    The specific intensity transforms according to <strong>Liouville's theorem</strong>
+    (<em>I</em><sub>&nu;</sub> / &nu;&sup3; = const along a ray),
+    giving an intensity boost of <em>D</em>&sup3; where
+    <em>D</em> = <em>f</em><sub>obs</sub>/<em>f</em><sub>emit</sub> = 1/&radic;(1 &minus; 1/<em>r</em>).
+</p>
+<p>
+    In principle, for a true Planck spectrum
+    <em>D</em>&sup3; &times; <em>B</em><sub>&nu;</sub>(<em>T</em>)
+    = <em>B</em><sub>&nu;</sub>(<em>D</em> &times; <em>T</em>),
+    so a temperature shift alone would capture both hue and brightness.
+    However, as discussed in the <a href="#sec-beaming">beaming section</a>,
+    the simulation's spectrum texture stores <strong>chromaticity</strong> (normalized colour),
+    not absolute Planck radiance.  The temperature lookup therefore only shifts the
+    <em>hue</em>; the <em>D</em>&sup3; intensity factor must be applied explicitly —
+    just as it is for the accretion disk emission.
+</p>
+
+<h4>Numerical examples</h4>
+<table>
+    <tr><th>Radius <em>r</em></th><th>Frequency boost <em>D</em></th><th>Intensity boost <em>D</em>&sup3;</th><th>Visual effect</th></tr>
+    <tr><td>11 <em>r<sub>s</sub></em> (default orbit)</td><td>1.05&times;</td><td>1.15&times;</td><td>Barely perceptible</td></tr>
+    <tr><td>3.0 <em>r<sub>s</sub></em></td><td>1.22&times;</td><td>1.83&times;</td><td>Noticeable bluing; stars brighter</td></tr>
+    <tr><td>1.5 <em>r<sub>s</sub></em> (photon sphere)</td><td>1.73&times;</td><td>5.20&times;</td><td>Strong blue tint; sky significantly brighter</td></tr>
+    <tr><td>1.1 <em>r<sub>s</sub></em></td><td>3.32&times;</td><td>36.5&times;</td><td>White-blue sky; extreme brightness</td></tr>
+    <tr><td>1.02 <em>r<sub>s</sub></em></td><td>7.14&times;</td><td>364&times;</td><td>Deep UV shift; sky blindingly bright</td></tr>
+    <tr><td>1.0002 <em>r<sub>s</sub></em> (min hover)</td><td>70.7&times;</td><td>3.54&times;10<sup>5</sup>&times;</td><td>Tiny exterior porthole; renderer compresses the final whiteout to preserve the collapse</td></tr>
+</table>
+
+<h3 id="sec-blueshift-freefall">14.2 Free-Falling Observer</h3>
+
+<p>
+    A free-falling observer who has turned off their engines and plunges radially from rest at infinity
+    experiences a very different view.  Their infall velocity at radius <em>r</em> is
+    <em>v</em><sub>local</sub> = &radic;(<em>r<sub>s</sub></em>/<em>r</em>)
+    relative to a static frame.  For overhead light (the same direction as their motion), the
+    relativistic Doppler effect of this recession <strong>redshifts</strong> the incoming light:
+</p>
+<div class="eq">
+    <em>f</em><sub>fall</sub> = <em>f</em><sub>emit</sub> / (1 + 1/&radic;<em>r</em>)
+</div>
+<p>
+    This can be derived from the covariant frequency formula
+    &nu; = &minus;<em>k</em><sub>&mu;</sub> <em>u</em><sup>&mu;</sup>,
+    where <em>k</em><sup>&mu;</sup> is the photon four-momentum and
+    <em>u</em><sup>&mu;</sup> is the observer four-velocity for radial free-fall from infinity in
+    Schwarzschild coordinates.  The full calculation yields:
+</p>
+<div class="eq">
+    <em>f</em><sub>fall</sub> / <em>f</em><sub>emit</sub>
+    = 1 / (1 + &radic;(1/<em>r</em>))
+</div>
+<p>
+    This is always &lt; 1 for <em>r</em> &gt; 0 — the <strong>kinematic Doppler redshift overpowers the
+    gravitational blueshift</strong>.  The free-falling observer sees overhead stars grow dimmer and
+    redder as they descend, not brighter and bluer.
+</p>
+
+<div class="note">
+    <strong>Key insight:</strong> The gravitational blueshift is a property of <em>where</em> you are in the potential
+    well, while the Doppler shift depends on <em>how</em> you are moving.  For a free-falling observer,
+    the two effects act in opposite directions, with the kinematic redshift winning.  Only a
+    <em>hovering</em> observer — one who has zero velocity relative to the static Schwarzschild
+    frame — experiences the pure gravitational blueshift.
+</div>
+
+<h3 id="sec-blueshift-impl">14.3 Implementation</h3>
+
+<p>
+    The simulation computes a gravitational blueshift factor
+    <code>grav_blueshift_factor</code> = &radic;(1 &minus; 1/<em>r</em><sub>obs</sub>)
+    which is passed to the shader as a uniform.  In the background-sky section of the ray tracer,
+    the effective Doppler factor for incoming starlight and galaxy light is:
+</p>
+<div class="eq">
+    bg_doppler = ray_doppler_factor &times; grav_blueshift_factor
+</div>
+<p>
+    where <code>ray_doppler_factor</code> = &gamma;(1 + <strong>ray</strong> &middot; (&minus;<strong>v</strong><sub>obs</sub>))
+    captures the kinematic Doppler from the observer's orbital or infall velocity.
+    This combined factor is used to shift the effective blackbody temperature of background
+    stars and the Milky Way.  Because the spectrum texture stores chromaticity
+    (see <a href="#sec-beaming">section 11</a>), not absolute Planck radiance, the
+    temperature shift only corrects the hue — the <em>D</em>&sup3; intensity boost
+    (<em>D</em> = 1/<em>bg_doppler</em>) is applied explicitly via <code>bg_boost</code>,
+    clamped to a maximum of 10&thinsp;000 to avoid numerical overflow in extreme cases.
+</p>
+
+<p>
+    For the accretion disk, the gravitational shift between emission and observer positions is
+    already handled by the dedicated redshift helper. The shader uses the
+    static Schwarzschild factor first and then applies the separate SR transfer factor for the
+    emitter motion, which keeps gravitational and kinematic pieces separated in the implementation.
+</p>
+
+<p>
+    Inside the event horizon (<em>r</em> &lt; <em>r<sub>s</sub></em>), the concept of a static observer
+    breaks down — the metric component <em>g<sub>tt</sub></em> changes sign — so the simulation
+    sets grav_blueshift_factor = 1.0 and defers to the existing interior rendering pipeline.
+</p>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The gravitational blueshift formula
+    1/&radic;(1 &minus; <em>r<sub>s</sub></em>/<em>r</em>) is <strong>exact</strong> for Schwarzschild spacetime.
+    The combined frequency formula for overhead light seen by a free-falling observer,
+    1/(1 + 1/&radic;<em>r</em>) is also exact, derivable from the covariant
+    inner product of the photon and observer four-velocities
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-hamilton-falling">[29]</a></sup>.
+    The rendered background colours remain approximate because the Milky Way texture is remapped
+    through a blackbody proxy rather than a full per-pixel spectrum, and the explicit D<sup>3</sup>
+    background boost is capped in extreme cases for numerical stability.
+</div>
+
+<!-- ============================================================ -->
+<!-- 15. RELATIVISTIC JETS -->
+<!-- ============================================================ -->
+
+<h2 id="sec-jets">15. Relativistic Jets</h2>
+
+<p>
+    The simulation offers bipolar relativistic jets along the black hole spin axis, with two models:
+</p>
+
+<h3>Simple jet</h3>
+<p>
+    A smooth parabolic jet with:
+</p>
+<ul>
+    <li><strong>Collimation:</strong> Jet radius <em>R</em>(<em>z</em>) = <em>R</em><sub>0</sub> <em>z</em><sup>0.58</sup>,
+        following the <strong>Asada &amp; Nakamura (2012)</strong> <sup><a href="#ref-asada">[21]</a></sup>
+        parabolic collimation profile observed in M87.</li>
+    <li><strong>Velocity:</strong> Accelerating to bulk Lorentz factor &Gamma;, with a helical twist component.</li>
+    <li><strong>Emission:</strong> Single-temperature black-body approximation for synchrotron, including
+        gravitational and relativistic Doppler temperature shift.</li>
+</ul>
+
+<h3>Detailed / GRMHD-inspired jet</h3>
+<p>
+    A more detailed <strong>analytic</strong> jet model incorporating qualitative trends from GRMHD
+    simulations and jet-imaging literature:
+</p>
+<p>
+    Its emissivity and beaming are synchrotron-motivated, but the displayed RGB colour is still
+    produced through an <strong>effective-temperature proxy</strong> and the same black-body lookup texture
+    used elsewhere in the renderer. The geometry and brightness trends are therefore inspired by
+    synchrotron jet models, but the simulation is not evaluating a literal frequency-resolved jet spectrum.
+</p>
+
+<h4>Spine/sheath structure</h4>
+<p>
+    GRMHD simulations show jets have a fast, magnetically-dominated <strong>spine</strong> surrounded by a
+    slower, denser <strong>sheath</strong> (disk wind). The simulation models this with separate velocity and
+    emissivity profiles for each component
+    <sup><a href="#ref-moscibrodzka">[22]</a></sup>.
+</p>
+
+<h4>Magnetization parameter &sigma;</h4>
+<p>
+    The ratio of magnetic to kinetic energy density:
+</p>
+<div class="eq">
+    &sigma; = <em>B</em>&sup2; / (4&pi;&rho;<em>c</em>&sup2;)
+</div>
+<p>
+    In GRMHD jets, &sigma; &gt;&gt; 1 at the base (Poynting-flux dominated) and decreases with distance as
+    magnetic energy converts to kinetic energy. The simulation parameterizes this as
+    &sigma;(<em>z</em>) = &sigma;<sub>0</sub> / (1 + 0.15<em>z</em>) + 0.5
+    <sup><a href="#ref-tchekhovskoy">[23]</a></sup>.
+</p>
+
+<h4>Reconfinement knots</h4>
+<p>
+    When the jet's internal pressure drops below the ambient pressure, standing oblique shocks form,
+    creating periodic bright knots. These are observed in real jets (e.g., M87's HST-1 knot, 3C 273).
+    The simulation models these as a sinusoidal standing-wave brightness pattern with configurable spacing
+    <sup><a href="#ref-fromm">[24]</a></sup>.
+</p>
+
+<h4>Jet-corona connection</h4>
+<p>
+    At the jet base, the magnetically-dominated funnel meets the hot corona above the accretion disk.
+    The simulation includes bright emission from this region, with emissivity scaling as
+    <em>r</em><sup>&minus;3</sup> (magnetic energy density, softened from <em>r</em><sup>&minus;4</sup>
+    to avoid excessive central concentration)
+    <sup><a href="#ref-moscibrodzka">[22]</a></sup>.
+    Two configurable parameters control this region:
+</p>
+<ul>
+    <li><strong>Base width</strong> (0&ndash;1): Controls the jet funnel collimation exponent at the base.
+        The collimation transitions from a base exponent <em>k</em><sub>base</sub> = 0.62&ndash;0.85
+        (controlled by this parameter) to the asymptotic Asada &amp; Nakamura value <em>k</em> = 0.58
+        at large distances. Lower values produce a narrower, more collimated base; higher values
+        produce a wider funnel reminiscent of a split-monopole field geometry.</li>
+    <li><strong>Corona extent</strong> (0&ndash;1): Controls the radial concentration of the corona emission.
+        Higher values produce a tighter, more axis-concentrated corona glow; lower values spread
+        the corona emission over a wider area.</li>
+</ul>
+
+<h4>Synchrotron beaming</h4>
+<p>
+    Jet emission follows the synchrotron beaming law:
+</p>
+<div class="eq">
+    <em>I</em><sub>obs</sub> = &delta;<sup>2+&alpha;</sup> <em>I</em><sub>emit</sub>
+</div>
+<p>
+    where &delta; is the Doppler factor and &alpha; &approx; 0.7 is the synchrotron spectral index.
+    This jet law is separate from the black-body D<sup>3</sup>/cinematic toggle in Section 11.
+    The simulation uses the exponent 2.7 (= 2 + 0.7)
+    <sup><a href="#ref-rybicki">[20]</a></sup>.
+</p>
+
+<h4>Counter-jet disk occultation</h4>
+<p>
+    The receding (counter) jet is partially blocked by the optically thick accretion disk near the
+    equatorial plane. The simulation models this as exponential absorption through the disk midplane,
+    as an extra visualization term. In real AGN, one-sided jet appearance is often dominated by
+    relativistic Doppler boosting and external absorption; disk occultation is only one possible
+    contributor and should not be treated here as an observationally established primary cause.
+</p>
+
+<!-- ============================================================ -->
+<!-- 16. GRMHD-INSPIRED MODE -->
+<!-- ============================================================ -->
+
+<h2 id="sec-grmhd">16. GRMHD-Inspired Mode</h2>
+
+<p>
+    When the <strong>GRMHD-inspired</strong> toggle is enabled, the simulation augments the baseline
+    analytic accretion and jet models with semi-analytic prescriptions inspired by
+    General Relativistic Magnetohydrodynamic (GRMHD) simulations. The goal is to borrow
+    qualitative morphology and parameter trends from the GRMHD literature, not to replace
+    full GRRT through simulation snapshots.
+</p>
+
+<div class="note">
+    <strong>What is GRMHD?</strong> In black-hole accretion work, GRMHD simulations usually evolve the
+    relativistic magnetofluid equations on a curved spacetime background (most often a fixed Kerr metric),
+    tracking the plasma density, velocity, pressure, and magnetic field near the hole. They are the
+    gold standard for modeling accretion-flow morphology and jet launching. This simulation uses
+    semi-analytic fitting functions inspired by GRMHD results — not the full numerical evolution —
+    to achieve real-time performance while retaining the essential qualitative trends.
+</div>
+
+<h3 id="sec-grmhd-two-temp">16.1 Two-Temperature Plasma (R<sub>high</sub> Prescription)</h3>
+
+<p>
+    In GRMHD simulations, the ion temperature <em>T<sub>i</sub></em> and electron temperature
+    <em>T<sub>e</sub></em> are generally different. Since radiation is produced primarily by
+    electrons, the electron temperature determines the observed emission. The simulation uses the
+    <strong>R<sub>high</sub> parameterization</strong> introduced by
+    Mościbrodzka, Falcke &amp; Shiokawa (2016)
+    <sup><a href="#ref-moscibrodzka16">[36]</a></sup>:
+</p>
+<div class="eq">
+    <em>T<sub>i</sub></em> / <em>T<sub>e</sub></em> = <em>R</em>(&beta;)
+    = <em>R</em><sub>high</sub> &beta;&sup2; / (1 + &beta;&sup2;)
+    + <em>R</em><sub>low</sub> / (1 + &beta;&sup2;)
+</div>
+<p>
+    where &beta; = <em>P</em><sub>gas</sub> / <em>P</em><sub>mag</sub> is the plasma beta parameter
+    and <em>R</em><sub>low</sub> = 1. This creates:
+</p>
+<ul>
+    <li><strong>Low &beta; (jet funnel, corona):</strong> <em>R</em> &asymp; 1, so <em>T<sub>e</sub></em> &asymp; <em>T<sub>i</sub></em> — electrons remain relatively hot and emission is bright.</li>
+    <li><strong>High &beta; (disk midplane):</strong> <em>R</em> &asymp; <em>R</em><sub>high</sub>, so <em>T<sub>e</sub></em> &asymp; <em>T<sub>i</sub></em>/<em>R</em><sub>high</sub> — electrons are cooler and emission is suppressed.</li>
+</ul>
+<p>
+    In the current renderer, this full suppression is used most directly in the GRMHD thick-torus
+    branch, where increasing <em>R</em><sub>high</sub> dims the high-&beta; disk body relative to the
+    low-&beta; corona / funnel wall. The thin- and slim-disk branches keep the <em>R</em><sub>high</sub>
+    influence deliberately milder so the visible-light RGB disk does not collapse into an almost
+    invisible corona-only image. As a result, <em>R</em><sub>high</sub> is still physically motivated
+    everywhere, but its strongest morphology effect appears in the torus-like GRMHD mode most closely
+    associated with EHT-style imagery
+    <sup><a href="#ref-eht-v">[37]</a></sup>.
+</p>
+
+<h3 id="sec-grmhd-synchrotron">16.2 Thermal Synchrotron Emission</h3>
+
+<p>
+    In low-luminosity systems such as <strong>M87*</strong> and <strong>Sgr&nbsp;A*</strong>, the observed
+    radio / millimeter emission is often modeled as
+    <strong>thermal synchrotron emission</strong> from hot, magnetized, optically thin plasma:
+</p>
+<div class="eq">
+    <em>j</em><sub>&nu;</sub> &prop; <em>n<sub>e</sub></em> &nu;<sub>s</sub>
+    <em>F</em>(&nu;/&nu;<sub>c</sub>)
+</div>
+<p>
+    where the spectral shape function is the relativistic thermal fit from Mahadevan, Narayan &amp; Yi (1996)
+    <sup><a href="#ref-mahadevan96">[38]</a></sup>:
+</p>
+<div class="eq">
+    <em>F</em>(<em>x</em>) = <em>x</em><sup>&minus;1/6</sup>
+    exp(&minus;1.8899 <em>x</em><sup>1/3</sup>)
+</div>
+
+<h4>Implementation as Spectral Correction</h4>
+
+<p>
+    Because this renderer produces visible-light blackbody images (not monochromatic radio maps),
+    evaluating the full synchrotron kernel at a specific observing frequency is not meaningful.
+    Instead, the synchrotron physics is captured as a <strong>spectral correction factor</strong>
+    that modulates emissivity based on the local magnetic field strength <em>B</em> and
+    electron density &rho;:
+</p>
+<div class="eq">
+    <em>C</em><sub>sync</sub> = 0.3 + 2.7 &middot; <em>B</em> &middot; (0.2 + 0.8 &rho;) / (1 + <em>B</em> &middot; (0.2 + 0.8 &rho;))
+</div>
+<p>
+    This yields a factor in the range ~[0.3, 3.0], ensuring that regions with strong magnetic
+    fields and high electron density emit more brightly (as expected from <em>j</em><sub>&nu;</sub>
+    &prop; <em>n<sub>e</sub></em> <em>B</em>&sup2;), while maintaining well-behaved values
+    across the full parameter space. The <em>B</em>-field strength parameter and density scale
+    slider both directly modulate this correction, providing responsive control.
+</p>
+<p>
+    A <strong>simplified opacity term loosely inspired by synchrotron self-absorption</strong>
+    is included for the thick torus (ADAF/RIAF), where the opacity scales with
+    turbulence-modulated density:
+    &alpha;<sub>abs</sub> &prop; <em>j</em><sub>torus</sub> &middot; turbulence<sup>0.5</sup> &middot;
+    (0.5 + 0.5 &middot; density_scale).
+    For the optically thick thin disk and slim disk, synchrotron absorption is less important
+    since these models are already emission-dominated.
+</p>
+
+<h3 id="sec-grmhd-mri">16.3 MRI Turbulence &amp; MAD State</h3>
+
+<p>
+    The <strong>magnetorotational instability</strong> (MRI; Balbus &amp; Hawley 1991
+    <sup><a href="#ref-balbus91">[39]</a></sup>) drives turbulence in accretion disks and is the
+    primary mechanism for angular momentum transport. In the GRMHD-inspired mode, MRI turbulence is modeled
+    with log-normal density fluctuations:
+</p>
+<div class="eq">
+    &rho; = &rho;<sub>0</sub> exp(&sigma;<sub>ln</sub> &xi;)
+</div>
+<p>
+    where &sigma;<sub>ln</sub> &asymp; 0.5 &ndash; 1.0 is the log-normal width (controlled by the
+    MRI turbulence parameter) and &xi; is a procedural noise field in co-rotating coordinates.
+    The density fluctuations are clamped to a dynamic range of 20&times; (0.2 &ndash; 4.0)
+    to prevent extreme outliers from overwhelming the torus geometry, consistent with the
+    1&ndash;2 &sigma; range observed in actual GRMHD density histograms.
+</p>
+<p>
+    Additional MRI-driven features include azimuthal scale-height variations (&plusmn;15%
+    at default turbulence, calibrated to Liska et al. 2022
+    <sup><a href="#ref-liska22">[45]</a></sup>) representing Parker instability
+    buoyant loops and MRI-induced warps.
+</p>
+<p>
+    Furthermore, near the <strong>Innermost Stable Circular Orbit (ISCO)</strong>, the shear and relativistic 
+    velocities reach their maximum, resulting in <strong>high-frequency micro-scale 
+    turbulence</strong> (rapid turbulent shredding). This is modeled by mixing in an additional, faster moving layer of 
+    continuous fractional Brownian motion heavily weighted by an exponential decay factor 
+    approaching the ISCO. This ensures chaotic and non-uniform plasma fluctuations 
+    close to the event horizon, breaking the appearance of uniform macroscopic banding near the center.
+</p>
+<p>
+    The <strong>Magnetically Arrested Disk</strong> (MAD) state occurs when magnetic flux accumulates
+    on the black hole until pressure balance arrests further accretion. MAD disks exhibit:
+</p>
+<ul>
+    <li>Dominant <em>m</em> = 1 spiral arm structure from flux tube interactions</li>
+    <li>Stronger magnetic fields (lower plasma &beta;) throughout</li>
+    <li>More powerful jets (up to &eta; ~ 100% accretion efficiency)</li>
+    <li>Episodic magnetic flux eruptions creating variability</li>
+</ul>
+<p>
+    The MAD flux parameter interpolates between SANE (Standard and Normal Evolution, MAD = 0) and
+    full MAD state (MAD = 1), following Tchekhovskoy, Narayan &amp; McKinney (2011)
+    <sup><a href="#ref-tchekhovskoy11">[40]</a></sup>.
+</p>
+
+<h3 id="sec-grmhd-fishbone">16.4 Fishbone-Moncrief-Inspired Helper</h3>
+
+<p>
+    The codebase contains a <strong>pseudo-Newtonian helper inspired by Fishbone &amp; Moncrief
+    (1976)</strong>
+    <sup><a href="#ref-fm76">[41]</a></sup>, the classic equilibrium-torus construction used as
+    an initial condition in GRMHD simulations:
+</p>
+<div class="eq">
+    <em>W</em> &minus; <em>W</em><sub>0</sub> = &minus;ln(<em>h</em>)
+</div>
+<p>
+    where <em>W</em> is the effective potential (gravitational + centrifugal) and <em>h</em> is the
+    specific enthalpy. In this repository the helper is implemented with a pseudo-Newtonian
+    (Paczyński-Wiita) potential for experimentation, but the <strong>current public thick-torus mode
+    does not directly render the exact Fishbone-Moncrief solution</strong>; it still uses the simpler
+    analytic torus emissivity profile described in Section 7.2.
+</p>
+
+<h3 id="sec-grmhd-turbulence-temperature">16.5 High-Frequency Chaos &amp; Dynamic Thermal Bands</h3>
+
+<p>
+    Near the <strong>Innermost Stable Circular Orbit (ISCO)</strong>, extreme relativistic shear
+    drives high-frequency, complex turbulent shredding. This is modeled by injecting rapid,
+    micro-scale fractional Brownian motion (fBm) heavily weighted by a spatially decaying factor
+    near the event horizon. This breaks the predictable visual uniformity of macroscopic banding
+    into chaotic, fluctuating plasma filaments.
+</p>
+<p>
+    Coupled with structural MRI fluctuations, the application of dynamic <strong>temperature variations</strong>
+    further prevents the "painted stripes" artifact seen in simpler procedural disks. Small variations
+    (up to ~5%) in local electron temperature are generated dynamically along orbital phase shifts and
+    fractal noise manifolds. Since blackbody thermal radiation scales proportionally with
+    <em>T</em><sup>4</sup> (Stefan-Boltzmann), even minor dynamic temperature shifts create deeply
+    organic and visually striking brightness waves sweeping continuously through the accretion disk.
+</p>
+
+<h3 id="sec-grmhd-nonthermal">16.6 Non-Thermal Electrons (κ-distribution)</h3>
+
+<p>
+    Magnetic reconnection in current sheets produces non-thermal electrons with a power-law energy tail.
+    The simulation models this using a <strong>κ-distribution</strong>:
+</p>
+<div class="eq">
+    <em>f</em>(<em>E</em>) &prop; (1 + <em>E</em>/&kappa;<em>kT</em>)<sup>&minus;(&kappa;+1)</sup>
+</div>
+<p>
+    The κ parameter controls the thermal/non-thermal balance:
+</p>
+<ul>
+    <li>&kappa; &rarr; &infin;: purely thermal (Maxwell-Jüttner distribution)</li>
+    <li>&kappa; ~ 3.5: significant non-thermal tail (strong reconnection; Ball+ 2018
+        <sup><a href="#ref-ball18">[42]</a></sup>, Werner et al. 2018
+        <sup><a href="#ref-werner18">[46]</a></sup>)</li>
+    <li>&kappa; ~ 8: nearly thermal with slight high-energy excess</li>
+</ul>
+<p>
+    Non-thermal electrons enhance synchrotron emission at high frequencies and modify the spectral
+    energy distribution, particularly in the jet funnel and corona regions where reconnection is
+    most vigorous.
+</p>
+
+<h3 id="sec-grmhd-isco">16.7 Non-Zero ISCO Stress</h3>
+
+<p>
+    The classical Novikov-Thorne model assumes zero torque at the ISCO (innermost stable circular
+    orbit), meaning accreting matter plunges freely inside the ISCO with no emission. GRMHD
+    simulations show this is <strong>incorrect</strong>: magnetic stress at the ISCO is significant,
+    and the plunging region contributes ~10&ndash;30% of the total disk luminosity
+    (Noble et al. 2010
+    <sup><a href="#ref-noble10">[43]</a></sup>, Penna et al. 2010
+    <sup><a href="#ref-penna10">[47]</a></sup>).
+</p>
+<p>
+    In this renderer, enabling the GRMHD-inspired controls allows thin-disk emission to extend inside
+    the ISCO with a gradual decay (rather than a hard cutoff), and MAD-like settings increase that
+    contribution further.
+</p>
+
+<h3 id="sec-grmhd-bz">16.8 Blandford-Znajek Jet Power</h3>
+
+<p>
+    The jet luminosity in the GRMHD-inspired mode is modulated by the <strong>Blandford &amp; Znajek (1977)</strong>
+    mechanism
+    <sup><a href="#ref-bz77">[25]</a></sup>:
+</p>
+<div class="eq">
+    <em>P</em><sub>BZ</sub> = (&kappa;/4&pi;<em>c</em>)
+    &Phi;<sub>BH</sub>&sup2; &Omega;<sub>H</sub>&sup2; <em>f</em>(&Omega;<sub>H</sub>)
+</div>
+<p>
+    where &Phi;<sub>BH</sub> is the magnetic flux threading the event horizon and
+    &Omega;<sub>H</sub> = <em>a</em>/(2<em>r</em><sub>+</sub>) is the angular velocity of the
+    horizon. In the MAD state, &Phi;<sub>BH</sub> saturates, so <em>P</em><sub>BZ</sub> &prop;
+    <em>a</em>&sup2; Ṁ. The simulation also includes:
+</p>
+<ul>
+    <li><strong>Current-driven kink instability</strong>: helical <em>m</em> = 1 distortions from
+        the wound-up magnetic field (Bromberg &amp; Tchekhovskoy 2016
+        <sup><a href="#ref-bromberg16">[48]</a></sup>)</li>
+    <li><strong>Synchrotron cooling break</strong>: spectral steepening with distance as electrons
+        radiate energy → jets become redder at large distances</li>
+</ul>
+
+<div class="comparison">
+    <strong>EHT comparison:</strong> The M87* preset with the GRMHD-inspired mode enabled at R<sub>high</sub> = 80,
+    MAD flux = 0.8 gives a qualitative crescent/ring morphology reminiscent of the EHT 2019 image.
+    The Sgr A* preset with R<sub>high</sub> = 20 and lower MAD flux gives a more symmetric ring-like
+    morphology reminiscent of EHT 2022 model families. These should be understood as visual presets,
+    not observational fits.
+</div>
+
+<!-- ============================================================ -->
+<!-- 17. VOLUMETRIC RT -->
+<!-- ============================================================ -->
+
+<h2 id="sec-volumetric">17. Volumetric Radiative Transfer</h2>
+
+<p>
+    The thick torus, slim disk, and jet models all use <strong>volumetric ray marching</strong> with the
+    radiative transfer equation:
+</p>
+<div class="eq">
+    d<em>I</em>/d<em>s</em> = <em>j</em> &minus; &alpha;<em>I</em>
+</div>
+<p>
+    where <em>j</em> is the emission coefficient, &alpha; is the absorption coefficient, and <em>s</em>
+    is the path length. Each integration step contributes:
+</p>
+<div class="eq">
+    &Delta;<em>I</em> = <em>T</em><sub>vol</sub> &middot; <em>j</em> &middot; &Delta;<em>s</em>
+    <br><em>T</em><sub>vol</sub> &times;= exp(&minus;&alpha; &middot; &Delta;<em>s</em>)
+    &nbsp;&nbsp;(Beer-Lambert law)
+</div>
+<p>
+    This uses <strong>front-to-back compositing</strong>: the accumulated transmittance
+    <em>T</em><sub>vol</sub> starts at 1.0 and decreases as light is absorbed. The code skips
+    computation when <em>T</em><sub>vol</sub> &lt; 0.005 (negligible remaining transparency).
+</p>
+<p>
+    For the <strong>slim disk</strong> (optically thick), the contribution uses the source function formulation:
+</p>
+<div class="eq">
+    &Delta;<em>I</em> = (1 &minus; exp(&minus;&tau;)) &middot; (<em>j</em>/&alpha;)
+</div>
+<p>
+    This correctly transitions between optically thin (&tau; &ll; 1, &Delta;<em>I</em> &approx; <em>j</em>&Delta;<em>s</em>)
+    and optically thick (&tau; &gg; 1, &Delta;<em>I</em> &approx; <em>j</em>/&alpha;) regimes
+    <sup><a href="#ref-rybicki">[20]</a></sup>.
+</p>
+
+<!-- ============================================================ -->
+<!-- 18. TONE MAPPING -->
+<!-- ============================================================ -->
+
+<h2 id="sec-tonemap">18. Tone Mapping &amp; Color Science</h2>
+
+<p>
+    The simulation runs in linear HDR color space and applies a tonemapper to map to display range.
+    Three modes are available:
+</p>
+
+<h3>ACES Filmic</h3>
+<p>
+    The Academy Color Encoding System (ACES) filmic curve, standard in film and VFX. Provides
+    pleasing highlight rolloff but can desaturate extreme colors.
+</p>
+
+<h3>AgX (default)</h3>
+<p>
+    Troy Sobotka's AgX formulation, designed for superior handling of high-saturation,
+    high-luminance colors without the hue shifts of ACES. Includes a "punchy" look transform
+    with contrast around middle-gray (0.18) and saturation boost to preserve Doppler hue shifts.
+</p>
+
+<h3>Scientific (logarithmic false-color)</h3>
+<p>
+    Mimics how scientific publications (e.g., EHT papers <sup><a href="#ref-eht">[14]</a></sup>) display
+    accretion disk data: log-scale intensity mapped through the <strong>inferno</strong> colormap
+    (matplotlib standard). This mode uses:
+</p>
+<div class="eq">
+    <em>t</em> = log<sub>2</sub>(1 + <em>L</em> &middot; <em>k</em>) / log<sub>2</sub>(1 + 0.15 <em>k</em>)
+</div>
+<p>
+    where <em>L</em> is scene luminance and <em>k</em> = 80 &middot; exposure. The result is mapped through
+    a polynomial approximation to the <em>inferno</em> palette (purple &rarr; red &rarr; orange &rarr; yellow &rarr; white).
+</p>
+
+<!-- ============================================================ -->
+<!-- 19. PLANET -->
+<!-- ============================================================ -->
+
+<h2 id="sec-planet">19. Planet Model</h2>
+
+<p>
+    A spherical test body orbits the black hole on a Keplerian circular orbit, demonstrating:
+</p>
+<ul>
+    <li><strong>Gravitational lensing:</strong> The planet's image is distorted as light bends around the black hole.</li>
+    <li><strong>Moving-body simplification:</strong> The shader applies a Lorentz-contraction-style
+        coordinate squeeze along the direction of motion. This is a simple visual model, not a full
+        Penrose-Terrell treatment of the apparent shape of a moving sphere.</li>
+    <li><strong>Light travel time:</strong> The planet's position is evaluated at the retarded time
+        (time when the light was actually emitted), not the current coordinate time.</li>
+    <li><strong>Doppler-shifted illumination proxy:</strong> The planet uses an effective thermal-illumination
+        proxy with planet/observer motion applied, but the detailed disk-emitter orbital Doppler
+        toward the planet is not resolved.</li>
+</ul>
+
+<h3>Orbital kinematics</h3>
+<p>
+    The planet uses the same circular-orbit local speed as the observer model,
+    <em>v</em> = 1 / &radic;(2(<em>r</em> &minus; 1)), converted to coordinate angular velocity by
+</p>
+<div class="eq">
+    &Omega;<sub>planet</sub> = &minus;<em>v</em> &middot; &radic;(1 &minus; 1/<em>r</em>) / <em>r</em>
+</div>
+<p>
+    so the orbital phase evolution is consistent with Schwarzschild coordinate time. As with the
+    observer-motion control, the public planet-distance control clamps the orbit to
+    <em>r</em> &ge; 3 <em>r<sub>s</sub></em> so the reference body remains in the stable timelike-orbit regime.
+</p>
+
+<h3>Planet irradiation and beaming</h3>
+<p>
+    The illumination temperature used for the planet is derived from accretion-flow temperature
+    profiles and includes gravitational redshift at the emission radii. This is a black-hole-centered
+    effective-source proxy rather than a resolved disk-patch illumination calculation. Planet brightness
+    is also transformed with the same transfer-factor beaming model used for the disk:
+</p>
+<ul>
+    <li><strong>Physical mode:</strong> <em>I</em><sub>obs</sub> = <em>D</em>&sup3; <em>I</em><sub>emit</sub></li>
+    <li><strong>Cinematic mode:</strong> softened power-law with Doppler clamping</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- 20. INTERIOR BLACK HOLE -->
+<!-- ============================================================ -->
+
+<h2 id="sec-interior">20. Interior Black Hole &amp; Analytical Escape Classification</h2>
+
+<p>
+    Once the observer crosses the event horizon (<em>r</em> &lt; <em>r<sub>s</sub></em>), the standard
+    exterior ray-tracing logic — march until the ray escapes to infinity or hits the horizon —
+    breaks down. Inside the horizon <em>all</em> future-directed timelike and null worldlines must
+    decrease in <em>r</em> (the radial coordinate becomes timelike), yet some
+    <strong>past-directed</strong> photon geodesics through an interior observer can still originate
+    in the exterior universe before the observer hits the singularity.
+    The simulation uses an <strong>analytical pre-classification</strong> based on the
+    Binet conserved energy to decide each ray's fate <em>before</em> entering the integration loop.
+</p>
+
+<h3 id="sec-binet-energy">20.1. Binet Conserved Energy</h3>
+
+<p>
+    The first-order Binet equation for photons in Schwarzschild spacetime is
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-chandrasekhar">[28]</a></sup>:
+</p>
+<div class="eq">
+    (d<em>u</em>/d&phi;)&sup2; = <em>u</em>&sup3; &minus; <em>u</em>&sup2; + 1/<em>b</em>&sup2;
+</div>
+<p>
+    where <em>u</em> = 1/<em>r</em> and <em>b</em> = <em>L</em>/<em>E</em> is the impact parameter
+    (in units where <em>r<sub>s</sub></em> = 1). Rearranging, define the
+    <strong>Binet conserved energy</strong>:
+</p>
+<div class="eq">
+    <em>E</em><sub>Binet</sub> = (d<em>u</em>/d&phi;)&sup2; + <em>u</em>&sup2; &minus; <em>u</em>&sup3;
+</div>
+<p>
+    This quantity is conserved along the geodesic (it equals 1/<em>b</em>&sup2; = const).
+    The term <em>u</em>&sup2; &minus; <em>u</em>&sup3; defines an <strong>effective potential barrier</strong>
+    for photon orbits. This potential has a maximum at <em>u</em> = 2/3 (i.e., <em>r</em> = 1.5 <em>r<sub>s</sub></em>,
+    the photon sphere):
+</p>
+<div class="eq">
+    <em>V</em><sub>max</sub> = (2/3)&sup2; &minus; (2/3)&sup3; = 4/9 &minus; 8/27 = 4/27 &approx; 0.1481
+</div>
+<p>
+    This critical value <em>E</em><sub>crit</sub> = 4/27 determines whether a photon can
+    surmount the barrier and escape, or whether it is reflected back and captured
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-chandrasekhar">[28]</a></sup>.
+</p>
+
+<h3 id="sec-escape-class">20.2. Escape vs. Capture Classification</h3>
+
+<p>
+    For each ray traced <strong>backward</strong> from the interior observer (at <em>u</em><sub>obs</sub> &gt; 1,
+    i.e., <em>r</em><sub>obs</sub> &lt; <em>r<sub>s</sub></em>), the shader computes the
+    initial d<em>u</em>/d&phi; from the ray's tangent vector and classifies it
+    <strong>analytically before any integration</strong>:
+</p>
+
+<table>
+    <tr>
+        <th>Condition</th>
+        <th>Outcome</th>
+        <th>Physical meaning</th>
+    </tr>
+    <tr>
+        <td>d<em>u</em>/d&phi; &ge; 0</td>
+        <td><strong>Captured</strong></td>
+        <td>Ray is moving inward (increasing <em>u</em> = 1/<em>r</em>); it will hit the singularity.</td>
+    </tr>
+    <tr>
+        <td>d<em>u</em>/d&phi; &lt; 0 and <em>E</em><sub>Binet</sub> &le; 4/27</td>
+        <td><strong>Captured</strong></td>
+        <td>Ray is moving outward but has insufficient energy to surmount the potential barrier
+            at the photon sphere; it is reflected back and captured.</td>
+    </tr>
+    <tr>
+        <td>d<em>u</em>/d&phi; &lt; 0 and <em>E</em><sub>Binet</sub> &gt; 4/27</td>
+        <td><strong>Originates outside</strong></td>
+        <td>The backward-traced ray has enough energy to clear the photon-sphere barrier and connect
+            to the external universe. This ray therefore shows the distorted image of the outside sky.</td>
+    </tr>
+</table>
+
+<p>
+    This classification is <strong>exact</strong> for Schwarzschild null geodesics — it follows
+    directly from the effective potential analysis of the orbit equation. It produces the
+    characteristic <strong>shrinking sky window</strong> effect: as the observer falls deeper
+    (larger <em>u</em><sub>obs</sub>), more of the effective energy goes into the
+    <em>u</em>&sup3; term, leaving fewer rays with <em>E</em><sub>Binet</sub> &gt; 4/27.
+    The cone of directions that show the outside universe narrows continuously until, at the
+    singularity, it vanishes entirely <sup><a href="#ref-hamilton-falling">[29]</a></sup>.
+</p>
+
+<div class="note">
+    <strong>Implementation detail:</strong> Because the vast majority of interior rays are captured
+    (especially deep inside the horizon), the analytical pre-classification allows the shader to
+    skip the expensive integration loop for those rays entirely, rendering them as black.
+    Only the small fraction of escaping rays enter the geodesic integration, dramatically
+    improving performance inside the black hole.
+</div>
+
+<h3 id="sec-analytical-exit">20.3. Analytical Exit Direction</h3>
+
+<p>
+    For rays that escape, the simulation needs to determine where they hit the background sky.
+    Rather than marching the ray all the way out (expensive and numerically fragile from the interior),
+    the shader uses the <strong>Binet tangent formula</strong> to compute the analytical exit direction.
+</p>
+<p>
+    At any point along the geodesic, the 3D direction vector in the orbital plane is:
+</p>
+<div class="eq">
+    <strong>d</strong> = <em>&phi;&#x0302;</em> / <em>u</em>
+    &minus; <em>r&#x0302;</em> &middot; (d<em>u</em>/d&phi;) / <em>u</em>&sup2;
+</div>
+<p>
+    where <em>&phi;&#x0302;</em> and <em>r&#x0302;</em> are the azimuthal and radial unit vectors.
+    As <em>u</em> &rarr; 0 (ray reaching infinity), this vector gives the asymptotic propagation
+    direction directly. The shader integrates only to the point where the ray exits the horizon
+    (or to a safe outer radius), then uses this formula to reconstruct the exit direction on
+    the sky sphere.
+</p>
+<p>
+    For escaping rays viewed from the interior, the simulation also applies a
+    <strong>heuristic interior brightness boost</strong> to the background sky luminance:
+</p>
+<div class="eq">
+    <em>f</em><sub>blue</sub> = 1 + 0.5 &middot; &radic;|1/<em>r</em> &minus; 1|,
+    &nbsp;&nbsp;capped at 4.0
+</div>
+<p>
+    This is a presentation-oriented approximation meant to keep the interior view readable while
+    suggesting the growing blueshift of escaping rays. It is not presented as an exact GR
+    intensity law.
+</p>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The escape classification is <em>exact</em> for Schwarzschild.
+    The shrinking-window effect — a circular porthole showing the outside universe that progressively
+    narrows as the observer approaches the singularity — matches the analytical predictions
+    in Hamilton &amp; Lisle (2008) <sup><a href="#ref-hamilton-falling">[29]</a></sup> and the
+    pedagogical visualizations by Hamilton
+    <a href="https://jila.colorado.edu/~ajsh/insidebh/">"Inside a black hole"</a>
+    <sup><a href="#ref-hamilton-inside">[30]</a></sup>.
+    The NASA Goddard visualization by Schnittman (2024) shows the same effect using a full
+    numerical ray-tracer <sup><a href="#ref-nasa-plunge">[31]</a></sup>.
+</div>
+
+<!-- ============================================================ -->
+<!-- 21. FREE-FALL DIVE -->
+<!-- ============================================================ -->
+
+<h2 id="sec-freefall">21. Free-Fall Dive &amp; Observer Frame</h2>
+
+<p>
+    The simulation offers a <strong>"Dive"</strong> mode that drops the observer on a
+    radial free-fall trajectory from rest at infinity into and through the event horizon.
+    This is the simplest physically realizable infall: a test mass released from infinity
+    with zero initial velocity.
+</p>
+
+<h3 id="sec-radial-freefall">21.1. Radial Free-Fall Trajectory</h3>
+
+<p>
+    For a massive test particle falling radially from rest at infinity in Schwarzschild spacetime,
+    the equation of motion in terms of proper time &tau; is
+    <sup><a href="#ref-mtw">[1]</a></sup> <sup><a href="#ref-hamilton-falling">[29]</a></sup>:
+</p>
+<div class="eq">
+    d<em>r</em>/d&tau; = &minus;&radic;(<em>r<sub>s</sub></em>/<em>r</em>)
+</div>
+<p>
+    In the simulation's units (<em>r<sub>s</sub></em> = 1, <em>c</em> = 1):
+</p>
+<div class="eq">
+    d<em>r</em>/d&tau; = &minus;&radic;(1/<em>r</em>) = &minus;<em>r</em><sup>&minus;1/2</sup>
+</div>
+<p>
+    This is integrated numerically using the <strong>RK2 midpoint method</strong> for stability:
+</p>
+<pre><code>k1   = -sqrt(1/r) * dt
+rMid = max(r + k1*0.5,  0.01)
+k2   = -sqrt(1/rMid) * dt
+newR = max(r + k2,  r_min)</code></pre>
+<p>
+    The renderer uses the locally measured radial speed of the falling observer relative to a
+    static Schwarzschild frame:
+</p>
+<div class="eq">
+    <em>v</em>(<em>r</em>) = &radic;(<em>r<sub>s</sub></em>/<em>r</em>) = &radic;(1/<em>r</em>)
+</div>
+<p>
+    This local speed approaches <em>c</em> as <em>r</em> &rarr; <em>r<sub>s</sub></em>. The simulation caps
+    <em>v</em> at 0.998<em>c</em> to avoid numerical singularities.
+</p>
+
+<div class="note">
+    <strong>Proper time to singularity:</strong> Integrating the equation of motion gives the
+    finite proper time from the horizon to the singularity for the specific infall model used here
+    (radial free-fall from rest at infinity) <sup><a href="#ref-mtw">[1]</a></sup>:
+    <div class="eq">
+        &Delta;&tau; = &int;<sub>0</sub><sup><em>r<sub>s</sub></em></sup> &radic;(<em>r</em>/<em>r<sub>s</sub></em>) d<em>r</em>
+        = (2/3) <em>r<sub>s</sub></em> = (2/3) &middot; 1 &approx; 0.667
+    </div>
+    This is experienced as a very short time — about 66 microseconds for a 10
+    <em>M</em><sub>☉</sub> black hole, or about 12 hours for M87*
+    (6.5 &times; 10<sup>9</sup> <em>M</em><sub>☉</sub>).
+</div>
+
+<h3 id="sec-dive-frame">21.2. Locally Inertial Dive Frame</h3>
+
+<p>
+    A real free-falling observer carries a <strong>locally inertial reference frame</strong>
+    (a tetrad). In this simulation, the camera uses a simpler <strong>orthonormal spatial basis</strong>
+    aligned with the infall direction, built with Three.js's <code>makeBasis()</code> from three
+    orthogonal vectors:
+</p>
+<ul>
+    <li><strong>Inward</strong> (<em>&ecirc;</em><sub>1</sub>): The direction of infall
+        (negative radial direction, &minus;<em>r&#x0302;</em>). This becomes the camera's
+        look direction.</li>
+    <li><strong>Right</strong> (<em>&ecirc;</em><sub>2</sub>): Perpendicular to infall and to
+        the vertical, computed via cross products.</li>
+    <li><strong>Up</strong> (<em>&ecirc;</em><sub>3</sub>): Completes the right-handed triad,
+        preferring alignment with the global <em>z</em>-axis.</li>
+</ul>
+<p>
+    This basis is passed to the ray-tracing shader as the observer's orientation matrix.
+    The shader then launches rays in the camera sky, using this basis to convert pixel
+    coordinates to 3D ray directions. Combined with the observer velocity used for aberration
+    and Doppler calculations, this gives a coherent dive presentation frame, but it is not
+    a full GR tetrad construction or transport law.
+</p>
+
+<h3 id="sec-interior-rendering">21.3. Interior Rendering Pipeline</h3>
+
+<p>
+    When the observer is inside the horizon (<em>r</em> &lt; <em>r<sub>s</sub></em>), the shader
+    activates the <strong>interior mode</strong>, which changes several aspects of the rendering:
+</p>
+<ol>
+    <li><strong>Analytical pre-classification</strong> (Section 20.2) eliminates the numerical
+        integration loop for most rays, which would otherwise waste the step budget on
+        captured trajectories.</li>
+    <li><strong>Adaptive stepping</strong> is relaxed: the maximum allowed relative <em>u</em>-change
+        is multiplied by a combined depth-dependent factor
+        <code>3 + 2 &middot; max(u &minus; 1, 0)</code>.
+        At the horizon (<em>u</em> = 1) this gives a 3&times; relaxation; deeper inside,
+        the allowance grows linearly with <em>u</em> to handle the rapidly changing curvature.
+        Additionally, an extra <strong>horizon-proximity step reduction</strong> is applied:
+        step &times;= 1 &minus; 0.6 &middot; exp(&minus;8 (<em>u</em> &minus; 1)&sup2;), reducing
+        the step by up to 60% near the horizon to improve accuracy in this critical
+        transition region. A minimum step floor of 0.5&pi;/NSTEPS prevents the step
+        from collapsing to zero.</li>
+    <li><strong>Frame-drag clamping:</strong> The <em>u</em>&sup3; frame-drag term (Section 5)
+        uses <code>min(<em>u</em>, 1.2)</code> instead of raw <em>u</em> to prevent the
+        spin correction from diverging at small <em>r</em>.</li>
+    <li><strong>Gravitational shift:</strong> The accretion disk redshift formula uses
+        <code>abs(1 &minus; 1/<em>r</em>)</code> to avoid taking the square root of a
+        negative number inside the horizon.</li>
+    <li><strong>Shadow capture condition:</strong> In the exterior, capture is <em>u</em> &ge; 1;
+        in the interior, two conditions apply: <em>u</em> &lt; 0 (non-physical reversal &mdash; a
+        numerical safety net) and <em>u</em> &ge; 20 (corresponding to <em>r</em> &le; 0.05 <em>r<sub>s</sub></em>,
+        effectively the singularity cutoff where further integration is pointless).</li>
+</ol>
+
+<div class="comparison">
+    <strong>Accuracy:</strong> The interior rendering faithfully solves the same Binet equation
+    that governs photon trajectories in the exterior — the equation is valid everywhere outside
+    the singularity. The technique of following photon geodesics backward from an interior observer
+    is described in Hamilton &amp; Lisle (2008) <sup><a href="#ref-hamilton-falling">[29]</a></sup>
+    and in the pedagogical visualizations by Andrew Hamilton at the University of Colorado
+    <sup><a href="#ref-hamilton-inside">[30]</a></sup>. The qualitative appearance — a narrowing
+    window of the external universe surrounded by darkness — matches the NASA Goddard
+    visualization <sup><a href="#ref-nasa-plunge">[31]</a></sup> and the analytical expectations from
+    Chandrasekhar's <em>Mathematical Theory of Black Holes</em>
+    <sup><a href="#ref-chandrasekhar">[28]</a></sup>.
+</div>
+
+<!-- ============================================================ -->
+<!-- 22. CINEMATIC SPEED -->
+<!-- ============================================================ -->
+
+<h2 id="sec-cinematic-speed">22. Cinematic Auto-Speed Envelope</h2>
+
+<p>
+    In a real free-fall, the observer accelerates continuously and crosses the most visually
+    interesting regions (the photon sphere and the event horizon) in a tiny fraction of the
+    total infall time. To give users time to appreciate these regions, the simulation offers
+    an <strong>auto-speed ("cinematic") mode</strong> that varies the playback rate as a
+    function of the observer's radial position.
+</p>
+
+<h3>Speed envelope function</h3>
+<p>
+    The effective playback speed is multiplied by a position-dependent factor:
+</p>
+<div class="eq">
+    <em>f</em>(<em>r</em>) =
+    (1 + <em>f</em><sub>far</sub>) / (1 + <em>f</em><sub>photon</sub> + <em>f</em><sub>horizon</sub>)
+</div>
+<p>where:</p>
+<div class="eq">
+    <em>f</em><sub>far</sub> = 2 &middot; max(<em>r</em> &minus; 3, 0) / 7
+    &nbsp;&nbsp;&nbsp;(speed-up far from hole)
+    <br>
+    <em>f</em><sub>photon</sub> = 3 &middot; exp(&minus;[(<em>r</em> &minus; 1.5)/0.30]&sup2;)
+    &nbsp;&nbsp;&nbsp;(slow near photon sphere)
+    <br>
+    <em>f</em><sub>horizon</sub> = 5 &middot; exp(&minus;[(<em>r</em> &minus; 1.0)/0.22]&sup2;)
+    &nbsp;&nbsp;&nbsp;(slow near horizon)
+</div>
+
+<table>
+    <tr><th>Region</th><th><em>r</em> / <em>r<sub>s</sub></em></th><th>Approximate <em>f</em></th><th>Effect</th></tr>
+    <tr><td>Far approach</td><td>&gt; 5</td><td>~1.6</td><td>Fast-forward through uneventful space</td></tr>
+    <tr><td>Near field</td><td>3 &ndash; 2</td><td>~1.0</td><td>Normal playback</td></tr>
+    <tr><td>Photon sphere</td><td>&sim;1.5</td><td>~0.25</td><td>4&times; slow-motion at peak lensing</td></tr>
+    <tr><td>Between photon sphere &amp; horizon</td><td>1.2</td><td>~0.6</td><td>Moderate slow-down</td></tr>
+    <tr><td>Event horizon</td><td>&sim;1.0</td><td>~0.17</td><td>6&times; slow-motion at horizon crossing</td></tr>
+    <tr><td>Deep interior</td><td>&lt; 0.5</td><td>~1.0</td><td>Returns to normal speed</td></tr>
+</table>
+
+<p>
+    The Gaussian shape of the slow-down factors is chosen so that the transitions are smooth
+    and continuous, with no abrupt speed changes. The photon sphere slow-down (width &sigma; = 0.30)
+    is broader than the horizon slow-down (&sigma; = 0.22) because the photon sphere's lensing
+    effects are visible over a wider range of radii.
+</p>
+
+<div class="note">
+    <strong>Physics rationale:</strong> The photon sphere (<em>r</em> = 1.5 <em>r<sub>s</sub></em>) is
+    where light can orbit the black hole, producing the most dramatic lensing —
+    higher-order Einstein rings and extreme magnification of the background sky.
+    The event horizon (<em>r</em> = <em>r<sub>s</sub></em>) is where the transition to the
+    interior regime occurs, with the sky window beginning its collapse.
+    Both are brief events in proper time but visually rich, motivating the slow-down.
+</div>
+
+<!-- ============================================================ -->
+<!-- 23. COMPARISON WITH REALITY -->
+<!-- ============================================================ -->
+
+<h2 id="sec-comparison">23. Comparison with Reality</h2>
+
+<h3>What the simulation gets right</h3>
+
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>Simulation</th>
+        <th>Reality / State of the art</th>
+        <th>Match</th>
+    </tr>
+    <tr>
+        <td>Photon geodesics (Schwarzschild)</td>
+        <td>Exact Binet equation, numerically integrated in the shader</td>
+        <td>Exact analytical solution<sup><a href="#ref-mtw">[1]</a></sup></td>
+        <td><strong>Exact equation</strong>; rendered accuracy depends on the integrator and step budget</td>
+    </tr>
+    <tr>
+        <td>Shadow size &amp; shape (Schwarzschild)</td>
+        <td>Emerges from geodesic tracing</td>
+        <td>r<sub>shadow</sub> = 3&radic;3/2 &middot; r<sub>s</sub> &approx; 2.598 r<sub>s</sub></td>
+        <td><strong>Exact in the Schwarzschild limit</strong>; rendered edge sharpness is resolution-limited</td>
+    </tr>
+    <tr>
+        <td>Einstein ring(s)</td>
+        <td>Naturally produced by ray tracing</td>
+        <td>Well-established prediction<sup><a href="#ref-mtw">[1]</a></sup></td>
+        <td><strong>Correct Schwarzschild lensing structure</strong>; higher-order rings are step-limited</td>
+    </tr>
+    <tr>
+        <td>Photon sphere</td>
+        <td>r = 1.5 r<sub>s</sub></td>
+        <td>r = 1.5 r<sub>s</sub> (Schwarzschild)</td>
+        <td><strong>Exact</strong></td>
+    </tr>
+    <tr>
+        <td>Gravitational redshift</td>
+        <td>Exact Schwarzschild transfer law for static sources; moving emitters use a static-plus-SR local approximation</td>
+        <td>Confirmed experimentally (Pound-Rebka, GPS)</td>
+        <td><strong>Exact for static Schwarzschild sources</strong>; approximate once source motion, plunging flow, or spin-inspired modes are introduced</td>
+    </tr>
+    <tr>
+        <td>Gravitational blueshift (background sky)</td>
+        <td>1/&radic;(1 &minus; r<sub>s</sub>/r) for hovering observer; combined with kinematic Doppler for free-fall</td>
+        <td>Exact GR prediction; time-reverse of gravitational redshift</td>
+        <td><strong>Exact transfer law</strong>; rendered sky colours remain spectrum-approximate and the explicit sky D<sup>3</sup> boost is capped in extreme cases</td>
+    </tr>
+    <tr>
+        <td>Relativistic Doppler effect</td>
+        <td>Full formula with transverse component</td>
+        <td>Standard result in SR/GR</td>
+        <td><strong>Exact law</strong>; renderer uses safety clamps in extreme regimes, and visible colours are exact only for blackbody-based sources</td>
+    </tr>
+    <tr>
+        <td>Relativistic beaming (D&sup3;)</td>
+        <td>Liouville invariant</td>
+        <td>Standard result<sup><a href="#ref-rybicki">[20]</a></sup></td>
+        <td><strong>Exact transfer law</strong>; thermal/background paths use safety clamps at extreme boosts, and explicit intensity scaling is still paired with approximate source spectra</td>
+    </tr>
+    <tr>
+        <td>Relativistic aberration</td>
+        <td>Lorentz velocity addition</td>
+        <td>Standard SR result</td>
+        <td><strong>Exact</strong></td>
+    </tr>
+    <tr>
+        <td>ISCO formula</td>
+        <td>Bardeen-Press-Teukolsky</td>
+        <td>Exact for Kerr<sup><a href="#ref-bpt">[8]</a></sup></td>
+        <td><strong>Exact</strong></td>
+    </tr>
+    <tr>
+        <td>Thin disk temperature profile</td>
+        <td>T &propto; r<sup>−3/4</sup>(1−&radic;(r<sub>in</sub>/r))<sup>1/4</sup></td>
+        <td>Shakura-Sunyaev / Novikov-Thorne<sup><a href="#ref-ss73">[10]</a></sup></td>
+        <td><strong>Correct zero-torque thin-disk proxy</strong>; not the full spin-dependent Novikov-Thorne correction</td>
+    </tr>
+    <tr>
+        <td>Disk left-right asymmetry</td>
+        <td>From Doppler + beaming</td>
+        <td>Predicted by Luminet (1979)<sup><a href="#ref-luminet">[18]</a></sup>, confirmed by EHT</td>
+        <td><strong>Qualitatively correct</strong></td>
+    </tr>
+    <tr>
+        <td>Circular-orbit time-dilation factor</td>
+        <td>d&tau;/d<em>t</em> = &radic;(1 − 3/(2r))</td>
+        <td>Exact for Schwarzschild<sup><a href="#ref-mtw">[1]</a></sup></td>
+        <td><strong>Exact Schwarzschild relation</strong>; implementation uses its inverse to advance scene time</td>
+    </tr>
+    <tr>
+        <td>Interior escape classification</td>
+        <td>Binet conserved energy vs. E<sub>crit</sub> = 4/27</td>
+        <td>Effective potential analysis<sup><a href="#ref-chandrasekhar">[28]</a></sup></td>
+        <td><strong>Exact</strong></td>
+    </tr>
+    <tr>
+        <td>Shrinking sky window (interior)</td>
+        <td>Emerges from escape classification</td>
+        <td>Hamilton &amp; Lisle (2008)<sup><a href="#ref-hamilton-falling">[29]</a></sup>,
+            NASA visualization<sup><a href="#ref-nasa-plunge">[31]</a></sup></td>
+        <td><strong>Exact Schwarzschild escape-cone geometry</strong>; brightness outside the cone includes a heuristic boost</td>
+    </tr>
+    <tr>
+        <td>Radial free-fall trajectory</td>
+        <td>dr/d&tau; = &minus;&radic;(1/r), RK2 integration</td>
+        <td>Exact Schwarzschild result<sup><a href="#ref-mtw">[1]</a></sup></td>
+        <td><strong>Exact equation</strong>, numerically integrated with a near-horizon velocity cap for stability</td>
+    </tr>
+</table>
+
+<h3>Where the simulation departs from reality</h3>
+
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>Simulation</th>
+        <th>Reality</th>
+        <th>Impact</th>
+    </tr>
+    <tr>
+        <td>Kerr geodesics (exterior)</td>
+        <td>Schwarzschild Binet equation with perturbative frame-drag correction and a small
+            spin-dependent capture-threshold heuristic;
+            Kerr equatorial angular velocity used for disk matter in "Kerr-inspired disk velocities" mode</td>
+        <td>Full Carter-constant geodesics in Boyer-Lindquist coords<sup><a href="#ref-carter">[6]</a></sup></td>
+        <td>The photon shadow shape is approximately circular rather than the correct
+            D-shaped silhouette. A full Mino-time Kerr geodesic integrator exists in the
+            codebase but is <strong>WIP</strong> and not yet exposed in the UI.
+            Disk matter motion in the disk-velocity mode is still simplified for SR Doppler/beaming.</td>
+    </tr>
+    <tr>
+        <td>Disk turbulence</td>
+        <td>Procedural fBm noise</td>
+        <td>MRI-driven MHD turbulence<sup><a href="#ref-balbus">[12]</a></sup></td>
+        <td>Visual appearance is plausible but not physical. Real turbulence
+            has different correlation structures and evolves according to MHD equations.</td>
+    </tr>
+    <tr>
+        <td>ADAF/RIAF model</td>
+        <td>Hybrid power-law + Gaussian profile with configurable falloff (default &beta;=2.5), opacity, and outer extent</td>
+        <td>Full GRMHD simulations<sup><a href="#ref-eht">[14]</a></sup></td>
+        <td>Qualitatively captures the correct morphology (geometrically thick, optically thin torus).
+            The configurable radial falloff and opacity allow tuning to match different GRMHD heating
+            prescriptions. Lacks the detailed spiral structures, magnetic field topology, and
+            time-dependent behavior seen in state-of-the-art GRMHD simulations.</td>
+    </tr>
+    <tr>
+        <td>Slim disk model</td>
+        <td>Configurable H/R, opacity, and ISCO puff factor with plunging-region emission</td>
+        <td>Full radiation-MHD simulations</td>
+        <td>Correctly models the key qualitative features: geometrically thicker than thin disk,
+            emission inside ISCO, radiation-pressure puffing near ISCO. The configurable parameters
+            allow matching different super-Eddington accretion rates.</td>
+    </tr>
+    <tr>
+        <td>Jet model</td>
+        <td>Parameterized analytic profiles with configurable base width and corona concentration</td>
+        <td>GRMHD + radiative transfer<sup><a href="#ref-moscibrodzka">[22]</a></sup></td>
+        <td>The more detailed jet mode captures the qualitative spine/sheath structure,
+            parabolic collimation, and knot features. Corona emission uses <em>r</em><sup>&minus;3</sup>
+            scaling with configurable extent. The emission profiles are
+            analytic fits rather than self-consistent solutions.</td>
+    </tr>
+    <tr>
+        <td>Milky Way Doppler colors</td>
+        <td>Approximate spectral model</td>
+        <td>Would need full spectral data per pixel</td>
+        <td>Background galaxy colors under Doppler shift are approximate.
+            The simulation estimates stellar temperatures from color ratios and
+            re-applies the Planck spectrum, which is reasonable for stellar light
+            but ignores nebular emission line spectra.</td>
+    </tr>
+    <tr>
+        <td>Self-illumination / reflection</td>
+        <td>Analytical returning radiation flux enhancement</td>
+        <td>Disk photons returning to disk after lensing</td>
+        <td>True ray-traced reflections are omitted for performance. Replaced with a heuristic,
+            Cunningham-inspired inner-disk flux enhancement that mimics the qualitative brightening
+            without attempting a quantitative returning-radiation calculation.</td>
+    </tr>
+</table>
+
+<h3>Comparison with EHT observations</h3>
+
+<p>
+    The <strong>Event Horizon Telescope (EHT)</strong> has imaged two black holes:
+    <strong>M87*</strong> (2019) <sup><a href="#ref-eht">[14]</a></sup> and
+    <strong>Sgr&nbsp;A*</strong> (2022) <sup><a href="#ref-eht-sgra">[26]</a></sup>.
+    Both images show:
+</p>
+<ul>
+    <li>A bright ring of emission with a dark central shadow —
+        <strong>the simulation reproduces this qualitatively</strong> via the Schwarzschild geodesic solver.</li>
+    <li>Brightness asymmetry in the ring due to Doppler beaming —
+        <strong>the simulation reproduces this qualitatively</strong> with Doppler shift and beaming.</li>
+    <li>Observed bright-ring diameter consistent with a shadow diameter of order
+        &sim;10.4 &times; the gravitational radius —
+        <strong>the simulation's Schwarzschild shadow size matches</strong>
+        (radius &sim;5.196 <em>r<sub>g</sub></em>, diameter &sim;10.392 <em>r<sub>g</sub></em>).</li>
+</ul>
+<p>
+    The EHT results are best matched by GRMHD simulations with the thick torus (ADAF/RIAF) accretion mode,
+    which this simulation provides as an option. However, the EHT's full pipeline uses general-relativistic
+    radiative transfer (GRRT) codes like <code>RAPTOR</code> <sup><a href="#ref-davelaar">[27]</a></sup>
+    and <code>BHOSS</code>, which solve the full Kerr geodesic equations and couple them to GRMHD
+    fluid data — a level of fidelity beyond the scope of a real-time WebGL simulation.
+</p>
+
+<h3>Comparison with <em>Interstellar</em> (2014)</h3>
+
+<p>
+    The black hole "Gargantua" rendered for the movie <em>Interstellar</em> by
+    <strong>James et al. (2015)</strong> <sup><a href="#ref-interstellar">[19]</a></sup>
+    used similar techniques to this simulation:
+</p>
+<ul>
+    <li>Ray-tracing photon geodesics in Kerr spacetime (they used exact Kerr geodesics;
+        this simulation uses the Schwarzschild Binet equation with a perturbative
+        frame-dragging correction for photon lensing, while using Kerr angular velocity
+        to drive disk matter in "Kerr-inspired disk velocities" mode).</li>
+    <li>Thin accretion disk with blackbody emission and Doppler shifting.</li>
+    <li>The movie team deliberately <strong>reduced the Doppler beaming</strong> for artistic reasons,
+        exactly as this simulation's "cinematic beaming" mode does.</li>
+    <li>The movie showed a nearly symmetric disk brightness; enabling physical D&sup3; beaming in
+        this simulation produces a more extreme (and more physically accurate) asymmetry.</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- 24. KNOWN LIMITATIONS -->
+<!-- ============================================================ -->
+
+<h2 id="sec-limitations">24. Known Limitations &amp; Approximations</h2>
+
+<ul>
+    <li><strong>Approximate Kerr lensing:</strong> The geodesic integrator uses the Schwarzschild
+        Binet equation with a perturbative frame-drag correction term and a small spin-dependent
+        shadow-squeeze capture heuristic rather than the full Carter (1968) separated Kerr equations.
+        The shadow shape for a spinning black hole is therefore approximately circular rather than
+        the correct D-shaped asymmetric silhouette.
+        A full Mino-time Kerr geodesic integrator exists in the codebase
+        (<code>kerr_init()</code>, <code>integrate_kerr_step()</code> in <code>geodesics.glsl</code>)
+        but is <strong>work-in-progress</strong> and not yet exposed in the UI.
+        The "Kerr-inspired disk velocities" mode uses Kerr angular velocity to drive disk matter
+        but still traces photon paths with the perturbative Binet equation.</li>
+    <li><strong>Returning radiation is analytical, not ray-traced:</strong> Photons gravitationally
+        lensed back onto the accretion disk are not individually tracked (that would require
+        recursive ray tracing). Instead, a heuristic Cunningham-inspired flux enhancement model is
+        applied (see <a href="#sec-self-irradiation">Section 7.4</a>). It is intended to reproduce
+        the qualitative brightening of the inner disk, not to serve as a quantitative returning-radiation solver.</li>
+    <li><strong>Disk is not self-consistent:</strong> The disk temperature, density, and velocity profiles are
+        prescribed analytically rather than evolved from MHD equations.</li>
+    <li><strong>No polarization:</strong> The simulation does not track photon polarization, which is
+        important for EHT science (the EHT measured M87*'s linear polarization pattern in 2021).</li>
+    <li><strong>GRMHD-inspired turbulence:</strong> When the GRMHD-inspired mode is enabled, the disk
+        and torus use MRI-inspired turbulence with log-normal density PDFs
+        (&sigma;<sub>ln</sub> &asymp; 0.4&ndash;1.0), spiral arm structure, and MAD flux tube
+        interactions. The simulation also injects time-dependent variations and fractal Brownian motion (fBm)
+        noise mapped seamlessly across spatial phases to produce organic, evolving plasma filament structures.
+        Without the GRMHD-inspired mode enabled, the turbulence texture is a simpler procedural noise model.</li>
+    <li><strong>GRMHD is a visual adaptation, not frequency-resolved:</strong> The cited GRMHD+GRRT
+        comparisons are typically evaluated at millimeter/radio observing bands (for example
+        ~230 GHz), with plasma temperatures far above visible-light blackbody values.
+        This renderer adapts the spatial morphology (R<sub>high</sub> crescent, MRI spirals,
+        &beta;-dependent structure) for visible-light blackbody emission at ~5000 K. The
+        synchrotron emissivity correction is a dimensionless modulation factor calibrated
+        to reproduce qualitative GRMHD features, not a true frequency-dependent radiative
+        transfer calculation.</li>
+    <li><strong>Background spectrum:</strong> The Milky Way background Doppler shift uses an approximate
+        temperature-matching scheme rather than per-pixel spectral data.</li>
+    <li><strong>Planet lighting model:</strong> The planet uses simplified point-source illumination
+        and texture shading rather than a full physical reflectance / reradiation model.</li>
+    <li><strong>No gravitational waves:</strong> The spacetime is static (or stationary for Kerr);
+        there is no dynamical spacetime evolution.</li>
+    <li><strong>Single black hole:</strong> No binary or multi-body spacetimes.</li>
+    <li><strong>No tidal effects in interior:</strong> The dive mode treats the observer as a point
+        particle; no tidal deformation (spaghettification) of the camera frame is modeled.</li>
+    <li><strong>No Penrose diagram mapping:</strong> The interior rendering uses the same
+        Schwarzschild coordinate Binet equation; it does not implement Kruskal–Szekeres or
+        Eddington–Finkelstein coordinates, so the coordinate singularity at the horizon
+        is handled by an abrupt switch rather than a smooth transition.</li>
+    <li><strong>Cinematic speed is artistic:</strong> The auto-speed envelope (Section 22) is
+        a user-experience choice, not a physical model — real free-fall has no variable speed.</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- 25. REFERENCES -->
+<!-- ============================================================ -->
+
+<h2 id="sec-references">25. References</h2>
+
+<ol class="references">
+    <li id="ref-mtw">
+        Misner, C. W., Thorne, K. S., &amp; Wheeler, J. A. (1973).
+        <em>Gravitation</em>. W. H. Freeman. ISBN: 0-7167-0344-0.
+        — The standard graduate GR textbook. Chapters 25 and 33 cover Schwarzschild geodesics
+        and black hole physics.
+    </li>
+    <li id="ref-schwarzschild">
+        Schwarzschild, K. (1916).
+        "Über das Gravitationsfeld eines Massenpunktes nach der Einsteinschen Theorie."
+        <em>Sitzungsberichte der Königlich Preussischen Akademie der Wissenschaften</em>, 1, 189–196.
+        <a href="https://ui.adsabs.harvard.edu/abs/1916SPAW.......189S">ADS</a>.
+        — The original paper deriving the Schwarzschild metric.
+    </li>
+    <li id="ref-wald">
+        Wald, R. M. (1984).
+        <em>General Relativity</em>. University of Chicago Press, pp. 136–146.
+        ISBN: 0-226-87033-2.
+        — Thorough derivation of geodesics and black hole properties.
+    </li>
+    <li id="ref-wiki-schwarz">
+        Supplementary online summary: "Schwarzschild geodesics — Bending of light by gravity."
+        <a href="https://en.wikipedia.org/wiki/Schwarzschild_geodesics#Bending_of_light_by_gravity">
+        Wikipedia</a>.
+        — Handy overview of the Binet equation and common numerical-integration approaches.
+    </li>
+    <li id="ref-kerr">
+        Kerr, R. P. (1963).
+        "Gravitational Field of a Spinning Mass as an Example of Algebraically Special Metrics."
+        <em>Physical Review Letters</em>, 11(5), 237–238.
+        <a href="https://doi.org/10.1103/PhysRevLett.11.237">doi:10.1103/PhysRevLett.11.237</a>.
+    </li>
+    <li id="ref-carter">
+        Carter, B. (1968).
+        "Global structure of the Kerr family of gravitational fields."
+        <em>Physical Review</em>, 174(5), 1559–1571.
+        <a href="https://doi.org/10.1103/PhysRev.174.1559">doi:10.1103/PhysRev.174.1559</a>.
+        — Introduces the Carter constant, the fourth integral of motion for Kerr geodesics.
+    </li>
+    <li id="ref-kerr-wiki">
+        Supplementary online summary: "Kerr metric — Frame dragging."
+        <a href="https://en.wikipedia.org/wiki/Kerr_metric#Frame_dragging">Wikipedia</a>.
+        — Frame-dragging angular velocity Ω = −g<sub>tφ</sub>/g<sub>φφ</sub>.
+    </li>
+    <li id="ref-bpt">
+        Bardeen, J. M., Press, W. H., &amp; Teukolsky, S. A. (1972).
+        "Rotating Black Holes: Locally Nonrotating Frames, Energy Extraction, and Scalar Synchrotron Radiation."
+        <em>The Astrophysical Journal</em>, 178, 347–370.
+        <a href="https://doi.org/10.1086/151796">doi:10.1086/151796</a>.
+        — Source of the ISCO formula for Kerr black holes.
+    </li>
+    <li id="ref-isco-wiki">
+        Supplementary online summary: "Innermost stable circular orbit."
+        <a href="https://en.wikipedia.org/wiki/Innermost_stable_circular_orbit">Wikipedia</a>.
+    </li>
+    <li id="ref-ss73">
+        Shakura, N. I. &amp; Sunyaev, R. A. (1973).
+        "Black holes in binary systems. Observational appearance."
+        <em>Astronomy &amp; Astrophysics</em>, 24, 337–355.
+        <a href="https://ui.adsabs.harvard.edu/abs/1973A&A....24..337S">ADS</a>.
+        Bibcode: 1973A&A....24..337S.
+        — The foundational paper on geometrically thin, optically thick accretion disks.
+    </li>
+    <li id="ref-nt73">
+        Novikov, I. D. &amp; Thorne, K. S. (1973).
+        "Astrophysics of Black Holes." In <em>Black Holes</em> (eds. C. DeWitt &amp; B. DeWitt),
+        Gordon and Breach, pp. 343–450.
+        <a href="https://ui.adsabs.harvard.edu/abs/1973bhol.conf..343N">ADS</a>.
+        — General-relativistic thin disk model.
+    </li>
+    <li id="ref-balbus">
+        Balbus, S. A. &amp; Hawley, J. F. (1991).
+        "A powerful local shear instability in weakly magnetized disks."
+        <em>The Astrophysical Journal</em>, 376, 214–222.
+        <a href="https://doi.org/10.1086/170270">doi:10.1086/170270</a>.
+        — Discovery of the magnetorotational instability (MRI) driving accretion disk turbulence.
+    </li>
+    <li id="ref-narayan94">
+        Narayan, R. &amp; Yi, I. (1994).
+        "Advection-dominated Accretion: A Self-similar Solution."
+        <em>The Astrophysical Journal</em>, 428, L13.
+        <a href="https://doi.org/10.1086/187381">doi:10.1086/187381</a>.
+        — Self-similar ADAF solution: n ∝ r<sup>−3/2</sup>, T ∝ r<sup>−1</sup>.
+    </li>
+    <li id="ref-eht">
+        Event Horizon Telescope Collaboration (2019).
+        "First M87 Event Horizon Telescope Results. I. The Shadow of the Supermassive Black Hole."
+        <em>The Astrophysical Journal Letters</em>, 875(1), L1.
+        <a href="https://doi.org/10.3847/2041-8213/ab0ec7">doi:10.3847/2041-8213/ab0ec7</a>.
+    </li>
+    <li id="ref-narayan95">
+        Narayan, R. &amp; Yi, I. (1995).
+        "Advection-dominated Accretion: Underfed Black Holes and Neutron Stars."
+        <em>The Astrophysical Journal</em>, 452, 710.
+        <a href="https://doi.org/10.1086/176546">doi:10.1086/176546</a>.
+        — Two-temperature ADAF with T<sub>e</sub> ∝ r<sup>−0.5</sup>.
+    </li>
+    <li id="ref-esin">
+        Esin, A. A., McClintock, J. E., &amp; Narayan, R. (1997).
+        "Advection-Dominated Accretion and the Spectral States of Black Hole X-Ray Binaries."
+        <em>The Astrophysical Journal</em>, 489(2), 865.
+        <a href="https://doi.org/10.1086/304822">doi:10.1086/304822</a>.
+    </li>
+    <li id="ref-rindler">
+        Rindler, W. (1977).
+        <em>Essential Relativity: Special, General, and Cosmological</em> (2nd ed.).
+        Springer. pp. 143–149. ISBN: 0-387-90230-6.
+        — Covers relativistic Doppler effect and aberration.
+    </li>
+    <li id="ref-luminet">
+        Luminet, J.-P. (1979).
+        "Image of a Spherical Black Hole with Thin Accretion Disk."
+        <em>Astronomy &amp; Astrophysics</em>, 75, 228–235.
+        <a href="https://ui.adsabs.harvard.edu/abs/1979A&A....75..228L">ADS</a>.
+        Bibcode: 1979A&A....75..228L.
+        — The first computed image of a black hole with an accretion disk,
+        showing the characteristic left-right asymmetry.
+    </li>
+    <li id="ref-interstellar">
+        James, O., von Tunzelmann, E., Franklin, P., &amp; Thorne, K. S. (2015).
+        "Gravitational lensing by spinning black holes in astrophysics, and in the movie <em>Interstellar</em>."
+        <em>Classical and Quantum Gravity</em>, 32(6), 065001.
+        <a href="https://doi.org/10.1088/0264-9381/32/6/065001">doi:10.1088/0264-9381/32/6/065001</a>.
+    </li>
+    <li id="ref-rybicki">
+        Rybicki, G. B. &amp; Lightman, A. P. (1979).
+        <em>Radiative Processes in Astrophysics</em>. Wiley-Interscience.
+        ISBN: 0-471-82759-2.
+        — Standard reference for radiative transfer, synchrotron radiation, and Liouville's theorem.
+    </li>
+    <li id="ref-asada">
+        Asada, K. &amp; Nakamura, M. (2012).
+        "The Structure of the M87 Jet: A Transition from Parabolic to Conical Streamlines."
+        <em>The Astrophysical Journal Letters</em>, 745(2), L28.
+        <a href="https://doi.org/10.1088/2041-8205/745/2/L28">doi:10.1088/2041-8205/745/2/L28</a>.
+        — Observational evidence for parabolic jet collimation (z<sup>0.58</sup>).
+    </li>
+    <li id="ref-moscibrodzka">
+        Mościbrodzka, M. et al. (2016).
+        "General relativistic models of the jet in M87."
+        <em>Astronomy &amp; Astrophysics</em>, 586, A38.
+        <a href="https://doi.org/10.1051/0004-6361/201527721">doi:10.1051/0004-6361/201527721</a>.
+        — GRMHD+radiative transfer models of M87's jet, calibrating spine/sheath structure.
+    </li>
+    <li id="ref-tchekhovskoy">
+        Tchekhovskoy, A., Narayan, R., &amp; McKinney, J. C. (2011).
+        "Efficient generation of jets from magnetically arrested accretion on rapidly spinning black holes."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 418(1), L79–L83.
+        <a href="https://doi.org/10.1111/j.1745-3933.2011.01147.x">doi:10.1111/j.1745-3933.2011.01147.x</a>.
+        — Magnetically arrested disk (MAD) jets with σ parameterization.
+    </li>
+    <li id="ref-fromm">
+        Fromm, C. M. et al. (2022).
+        "Impact of non-thermal particles on the spectral and structural properties of M87."
+        <em>Astronomy &amp; Astrophysics</em>, 660, A107.
+        <a href="https://doi.org/10.1051/0004-6361/202142625">doi:10.1051/0004-6361/202142625</a>.
+        — Jet+disk modeling for EHT, reconfinement shock features.
+    </li>
+    <li id="ref-bz77">
+        Blandford, R. D. &amp; Znajek, R. L. (1977).
+        "Electromagnetic extraction of energy from Kerr black holes."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 179(3), 433–456.
+        <a href="https://doi.org/10.1093/mnras/179.3.433">doi:10.1093/mnras/179.3.433</a>.
+        — The Blandford-Znajek mechanism for jet power extraction from spinning black holes.
+    </li>
+    <li id="ref-eht-sgra">
+        Event Horizon Telescope Collaboration (2022).
+        "First Sagittarius A* Event Horizon Telescope Results. I. The Shadow of the Supermassive Black Hole at the Center of the Milky Way."
+        <em>The Astrophysical Journal Letters</em>, 930(2), L12.
+        <a href="https://doi.org/10.3847/2041-8213/ac6674">doi:10.3847/2041-8213/ac6674</a>.
+    </li>
+    <li id="ref-davelaar">
+        Davelaar, J. et al. (2019).
+        "Modeling the polarization of the jet in M87 at 230 GHz."
+        <em>Astronomy &amp; Astrophysics</em>, 632, A2.
+        <a href="https://doi.org/10.1051/0004-6361/201936498">doi:10.1051/0004-6361/201936498</a>.
+        <a href="https://arxiv.org/abs/1905.02600">arXiv:1905.02600</a>.
+        — RAPTOR ray-tracing code for GRMHD jet models.
+    </li>
+    <li id="ref-chandrasekhar">
+        Chandrasekhar, S. (1983).
+        <em>The Mathematical Theory of Black Holes</em>. Oxford University Press. ISBN: 0-19-850370-9.
+        — Comprehensive treatment of geodesics in Schwarzschild and Kerr spacetimes, including
+        the effective potential for photon orbits and the critical impact parameter.
+    </li>
+    <li id="ref-hamilton-falling">
+        Hamilton, A. J. S. &amp; Lisle, J. P. (2008).
+        "The river model of black holes."
+        <em>American Journal of Physics</em>, 76(6), 519–532.
+        <a href="https://doi.org/10.1119/1.2830526">doi:10.1119/1.2830526</a>.
+        <a href="https://arxiv.org/abs/gr-qc/0411060">arXiv:gr-qc/0411060</a>.
+        — Describes the "river model" for visualizing black hole interiors; discusses what
+        a free-falling observer sees including the shrinking sky window.
+    </li>
+    <li id="ref-hamilton-inside">
+        Hamilton, A. J. S.
+        "Falling into a black hole."
+        JILA, University of Colorado.
+        <a href="https://jila.colorado.edu/~ajsh/insidebh/">https://jila.colorado.edu/~ajsh/insidebh/</a>.
+        — Pedagogical visualization showing the visual appearance from inside a Schwarzschild
+        black hole, including the collapsing sky window, blueshift, and appearance of the singularity.
+    </li>
+    <li id="ref-nasa-plunge">
+        Schnittman, J. D. &amp; NASA Goddard Space Flight Center (2024).
+        "NASA's Black Hole Visualization Takes Viewers Beyond the Brink."
+        <a href="https://svs.gsfc.nasa.gov/14681/">https://svs.gsfc.nasa.gov/14681/</a>.
+        <a href="https://www.youtube.com/watch?v=1_bR4wv3RRo">YouTube</a>.
+        — Full numerical ray-tracing visualization of a plunge into a supermassive black hole,
+        showing the shrinking sky porthole, blueshift of the external universe, and
+        multiple Einstein ring images from inside the horizon.
+    </li>
+    <li id="ref-wiki-freefall">
+        Supplementary online summary: "Schwarzschild geodesics — Radial free fall."
+        <a href="https://en.wikipedia.org/wiki/Schwarzschild_geodesics#Radial_free_fall">Wikipedia</a>.
+        — Derivation of dr/dτ = −√(r<sub>s</sub>/r) for a test mass falling from rest at infinity.
+    </li>
+    <li id="ref-moscibrodzka16">
+        Mościbrodzka, M., Falcke, H., &amp; Shiokawa, H. (2016).
+        "General relativistic magnetohydrodynamical simulations of the jet in M 87."
+        <em>Astronomy &amp; Astrophysics</em>, 586, A38.
+        <a href="https://doi.org/10.1051/0004-6361/201526630">doi:10.1051/0004-6361/201526630</a>.
+        <a href="https://arxiv.org/abs/1510.07243">arXiv:1510.07243</a>.
+        — Introduces the R<sub>high</sub> two-temperature prescription for electron heating
+        in GRMHD simulations, used by the EHT collaboration.
+    </li>
+    <li id="ref-eht-v">
+        Event Horizon Telescope Collaboration (2019).
+        "First M87 Event Horizon Telescope Results. V. Physical Origin of the Asymmetric Ring."
+        <em>The Astrophysical Journal Letters</em>, 875(1), L5.
+        <a href="https://doi.org/10.3847/2041-8213/ab0f43">doi:10.3847/2041-8213/ab0f43</a>.
+        — EHT Paper V: comparison of GRMHD models with observations, constraining R<sub>high</sub>,
+        spin, and MAD/SANE state for M87*.
+    </li>
+    <li id="ref-mahadevan96">
+        Mahadevan, R., Narayan, R., &amp; Yi, I. (1996).
+        "Harmony in Electrons: Cyclotron and Synchrotron Emission by Thermal Electrons in a Magnetic Field."
+        <em>The Astrophysical Journal</em>, 465, 327.
+        <a href="https://doi.org/10.1086/177422">doi:10.1086/177422</a>.
+        — Analytic fitting functions for thermal synchrotron emissivity and absorptivity.
+    </li>
+    <li id="ref-balbus91">
+        Balbus, S. A. &amp; Hawley, J. F. (1991).
+        "A powerful local shear instability in weakly magnetized disks. I. Linear analysis."
+        <em>The Astrophysical Journal</em>, 376, 214–222.
+        <a href="https://doi.org/10.1086/170270">doi:10.1086/170270</a>.
+        — Discovery of the magnetorotational instability (MRI) as the mechanism
+        for angular momentum transport in accretion disks.
+    </li>
+    <li id="ref-tchekhovskoy11">
+        Tchekhovskoy, A., Narayan, R., &amp; McKinney, J. C. (2011).
+        "Efficient generation of jets from magnetically arrested accretion on rapidly spinning black holes."
+        <em>Monthly Notices of the Royal Astronomical Society: Letters</em>, 418(1), L79–L83.
+        <a href="https://doi.org/10.1111/j.1745-3933.2011.01147.x">doi:10.1111/j.1745-3933.2011.01147.x</a>.
+        <a href="https://arxiv.org/abs/1108.0412">arXiv:1108.0412</a>.
+        — Magnetically arrested disk (MAD) simulations showing jet efficiencies exceeding 100%.
+    </li>
+    <li id="ref-fm76">
+        Fishbone, L. G. &amp; Moncrief, V. (1976).
+        "Relativistic fluid disks in orbit around Kerr black holes."
+        <em>The Astrophysical Journal</em>, 207, 962–976.
+        <a href="https://doi.org/10.1086/154565">doi:10.1086/154565</a>.
+        — Equilibrium torus solution used as standard initial conditions for GRMHD simulations.
+    </li>
+    <li id="ref-ball18">
+        Ball, D. et al. (2018).
+        "Electron and Proton Acceleration in Trans-relativistic Magnetic Reconnection."
+        <em>The Astrophysical Journal</em>, 862(1), 80.
+        <a href="https://doi.org/10.3847/1538-4357/aac820">doi:10.3847/1538-4357/aac820</a>.
+        — PIC simulations of electron acceleration in reconnection layers,
+        motivating the κ-distribution model for non-thermal electrons.
+    </li>
+    <li id="ref-noble10">
+        Noble, S. C. et al. (2010).
+        "Direct Calculation of the Torque at the Inner Edge of an Accretion Disk around a Black Hole."
+        <em>The Astrophysical Journal</em>, 711(2), 959–973.
+        <a href="https://doi.org/10.1088/0004-637X/711/2/959">doi:10.1088/0004-637X/711/2/959</a>.
+        — GRMHD demonstration that magnetic stress at the ISCO is non-zero, contradicting
+        the Novikov-Thorne no-torque boundary condition.
+    </li>
+    <li id="ref-pandya16">
+        Pandya, A. et al. (2016).
+        "Polarized Synchrotron Emissivities and Absorptivities for Relativistic Thermal, Power-law, and Kappa Distribution Functions."
+        <em>The Astrophysical Journal</em>, 822(1), 34.
+        <a href="https://doi.org/10.3847/0004-637X/822/1/34">doi:10.3847/0004-637X/822/1/34</a>.
+        — Comprehensive synchrotron emission/absorption coefficients for thermal and non-thermal distributions.
+    </li>
+    <li id="ref-cunningham">
+        Cunningham, C. T. (1976).
+        "The effects of redshifts and focusing on the spectrum of an accretion disk around a Kerr black hole."
+        <em>The Astrophysical Journal</em>, 208, 534–549.
+        <a href="https://ui.adsabs.harvard.edu/abs/1976ApJ...208..534C">ADS</a>.
+        — Classic returning-radiation treatment for black-hole accretion disks.
+    </li>
+    <li id="ref-liska22">
+        Liska, M. et al. (2022).
+        "Formation of precessing jets by tilted black hole discs in 3D global GRMHD simulations."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 512(1), 995–1017.
+        <a href="https://doi.org/10.1093/mnras/stac062">doi:10.1093/mnras/stac062</a>.
+        — Example GRMHD study used here only as qualitative motivation for disk-thickness variability and warps.
+    </li>
+    <li id="ref-werner18">
+        Werner, G. R. et al. (2018).
+        "Non-thermal particle acceleration in 3D relativistic magnetic reconnection in pair plasmas."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 473(4), 4840–4861.
+        <a href="https://doi.org/10.1093/mnras/stx2530">doi:10.1093/mnras/stx2530</a>.
+        — Supports the use of non-thermal particle tails as qualitative motivation for the κ-distribution control.
+    </li>
+    <li id="ref-penna10">
+        Penna, R. F. et al. (2010).
+        "Simulations of magnetized discs around black holes: effects of black hole spin, disc thickness and magnetic field geometry."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 408(2), 752–782.
+        <a href="https://doi.org/10.1111/j.1365-2966.2010.17170.x">doi:10.1111/j.1365-2966.2010.17170.x</a>.
+        — GRMHD study showing continued stress and emission inside the ISCO.
+    </li>
+    <li id="ref-bromberg16">
+        Bromberg, O. &amp; Tchekhovskoy, A. (2016).
+        "Relativistic MHD simulations of core-collapse GRB jets: 3D instabilities and magnetic dissipation."
+        <em>Monthly Notices of the Royal Astronomical Society</em>, 456(2), 1739–1760.
+        <a href="https://doi.org/10.1093/mnras/stv2592">doi:10.1093/mnras/stv2592</a>.
+        — Cited here only as qualitative motivation for current-driven kink structure in the jet.
+    </li>
+</ol>
+
+<hr>
+
+<p style="text-align: center; color: #8b949e; font-size: 0.85em;">
+    Document generated for the
+    <a href="https://github.com/Adriwin06/black-hole">black-hole simulation</a> project.
+    <br>
+    Last updated: March 2026.
+</p>
+
+</div>
+</body>
+</html>

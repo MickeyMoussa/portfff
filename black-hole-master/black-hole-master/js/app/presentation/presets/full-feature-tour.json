@@ -1,0 +1,1458 @@
+{
+  "name": "Full Feature Tour",
+  "duration": 186,
+  "loop": false,
+  "tracks": [
+    {
+      "path": "observer.distance",
+      "keys": [
+        {
+          "t": 0,
+          "v": 21.5
+        },
+        {
+          "t": 24,
+          "v": 20.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 48,
+          "v": 18.0,
+          "ease": "smoother"
+        },
+        {
+          "t": 72,
+          "v": 16.4,
+          "ease": "smoother"
+        },
+        {
+          "t": 96,
+          "v": 15.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 120,
+          "v": 14.2,
+          "ease": "smooth"
+        },
+        {
+          "t": 144,
+          "v": 13.4,
+          "ease": "smoother"
+        },
+        {
+          "t": 152,
+          "v": 13.2,
+          "ease": "smooth"
+        },
+        {
+          "t": 161,
+          "v": 13.2
+        },
+        {
+          "t": 162,
+          "v": 12.8,
+          "ease": "smooth"
+        },
+        {
+          "t": 178,
+          "v": 12.8
+        },
+        {
+          "t": 186,
+          "v": 14.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "path": "observer.orbital_inclination",
+      "keys": [
+        {
+          "t": 0,
+          "v": -8
+        },
+        {
+          "t": 118,
+          "v": -8
+        },
+        {
+          "t": 126,
+          "v": 16,
+          "ease": "smoother"
+        },
+        {
+          "t": 132,
+          "v": 6,
+          "ease": "smooth"
+        },
+        {
+          "t": 186,
+          "v": 4,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "path": "cameraPan.x",
+      "keys": [
+        {
+          "t": 0,
+          "v": 0.0
+        },
+        {
+          "t": 20,
+          "v": 0.06,
+          "ease": "smooth"
+        },
+        {
+          "t": 44,
+          "v": -0.03,
+          "ease": "smooth"
+        },
+        {
+          "t": 68,
+          "v": 0.08,
+          "ease": "smoother"
+        },
+        {
+          "t": 92,
+          "v": -0.05,
+          "ease": "smoother"
+        },
+        {
+          "t": 116,
+          "v": 0.04,
+          "ease": "smooth"
+        },
+        {
+          "t": 140,
+          "v": -0.02,
+          "ease": "smooth"
+        },
+        {
+          "t": 186,
+          "v": 0.03,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "path": "cameraPan.y",
+      "keys": [
+        {
+          "t": 0,
+          "v": 0.04
+        },
+        {
+          "t": 30,
+          "v": 0.08,
+          "ease": "smooth"
+        },
+        {
+          "t": 62,
+          "v": -0.02,
+          "ease": "smoother"
+        },
+        {
+          "t": 90,
+          "v": 0.06,
+          "ease": "smooth"
+        },
+        {
+          "t": 120,
+          "v": -0.03,
+          "ease": "smoother"
+        },
+        {
+          "t": 150,
+          "v": 0.02,
+          "ease": "smooth"
+        },
+        {
+          "t": 186,
+          "v": -0.01,
+          "ease": "smooth"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "observer.motion",
+      "value": false
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "disk_self_irradiation",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "planet.enabled",
+      "value": false
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "grmhd.enabled",
+      "value": false
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "jet.enabled",
+      "value": false
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "kerr_mode",
+      "value": "kerr_inspired_disk_velocity"
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "accretion_mode",
+      "value": "thin_disk"
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "accretion_disk",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "black_hole.spin_enabled",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "observer.distance",
+      "value": 21.5
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "beaming",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "aberration",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "jet.mode",
+      "value": "simple"
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "physical_beaming",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "cameraPan.x",
+      "value": 0.0
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "dive.cinematic",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "dive.speed",
+      "value": 0.48
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "cameraPan.y",
+      "value": 0.04
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "look.tonemap_mode",
+      "value": 1
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "hover.speed",
+      "value": 0.22
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "lorentz_contraction",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "gravitational_time_dilation",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "light_travel_time",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "doppler_shift",
+      "value": true
+    },
+    {
+      "t": 0.0,
+      "action": "set",
+      "path": "cinematic_tonemap",
+      "value": true
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.galaxy_gain",
+      "value": 0.4
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "torus.h_ratio",
+      "value": 0.45
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.doppler_boost",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "planet.radius",
+      "value": 0.4
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "black_hole.spin",
+      "value": 0.9
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "black_hole.spin_strength",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "torus.r0",
+      "value": 4.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "torus.opacity",
+      "value": 0.015
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "time_scale",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "slim.opacity",
+      "value": 0.6
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "slim.puff_factor",
+      "value": 2.5
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.half_angle",
+      "value": 5.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.brightness",
+      "value": 1.2
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "disk_temperature",
+      "value": 5000
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.exposure",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.glow",
+      "value": 0.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "slim.h_ratio",
+      "value": 0.15
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.disk_gain",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.star_gain",
+      "value": 0.4
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "look.aberration_strength",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.knot_spacing",
+      "value": 6.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.magnetic_beta",
+      "value": 10.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.corona_brightness",
+      "value": 1.5
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.base_width",
+      "value": 0.4
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.corona_extent",
+      "value": 0.5
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.r_high",
+      "value": 40.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.mad_flux",
+      "value": 0.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.turbulence_amp",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "bloom.threshold",
+      "value": 0.65
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.magnetic_field_str",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "bloom.strength",
+      "value": 0.35
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "bloom.radius",
+      "value": 0.85
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "planet.distance",
+      "value": 14.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.magnetization",
+      "value": 10.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.density_scale",
+      "value": 1.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.lorentz_factor",
+      "value": 3.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "jet.length",
+      "value": 30.0
+    },
+    {
+      "t": 0.01,
+      "action": "set",
+      "path": "grmhd.electron_kappa",
+      "value": 5.0
+    },
+    {
+      "t": 0.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 0.4,
+      "action": "annotation",
+      "note": {
+        "title": "Full Feature Tour",
+        "text": "A chaptered walkthrough of solver modes, disk models, jets, relativistic effects, hover approach, and freefall dive.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "right",
+        "offset": 56,
+        "color": "#7cc5ff",
+        "width": 345
+      }
+    },
+    {
+      "t": 12.0,
+      "action": "set",
+      "path": "black_hole.spin_enabled",
+      "value": false
+    },
+    {
+      "t": 12.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 12.3,
+      "action": "annotation",
+      "note": {
+        "title": "Schwarzschild Snapshot",
+        "text": "Spin is disabled to show the symmetric non-rotating shadow as a direct comparison baseline.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#94d4ff",
+        "width": 325
+      }
+    },
+    {
+      "t": 20.0,
+      "action": "set",
+      "path": "black_hole.spin_enabled",
+      "value": true
+    },
+    {
+      "t": 20.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 20.3,
+      "action": "annotation",
+      "note": {
+        "title": "Kerr Restored",
+        "text": "Frame dragging and rotational asymmetry return, shifting the brightness crescent and ring structure.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#7fc8ff",
+        "width": 325
+      }
+    },
+    {
+      "t": 28.0,
+      "action": "set",
+      "path": "kerr_mode",
+      "value": "fast"
+    },
+    {
+      "t": 28.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 28.3,
+      "action": "annotation",
+      "note": {
+        "title": "Fast Solver",
+        "text": "Switch to the fast Schwarzschild/Binet lensing path for performance-oriented rendering with simplified spin effects.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#8fd0ff",
+        "width": 325
+      }
+    },
+    {
+      "t": 36.0,
+      "action": "set",
+      "path": "kerr_mode",
+      "value": "kerr_inspired_disk_velocity"
+    },
+    {
+      "t": 36.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 36.3,
+      "action": "annotation",
+      "note": {
+        "title": "Kerr-Inspired Disk Velocities",
+        "text": "Return to the mode that keeps approximate Binet lensing but uses Kerr-inspired orbital velocities for emitting disk material.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#74beff",
+        "width": 340
+      }
+    },
+    {
+      "t": 44.0,
+      "action": "set",
+      "path": "accretion_disk",
+      "value": false
+    },
+    {
+      "t": 44.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 44.3,
+      "action": "annotation",
+      "note": {
+        "title": "Lensing Geometry",
+        "text": "With disk emission disabled, the pure background lensing map and shadow boundary are easier to isolate.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#9ed8ff",
+        "width": 330
+      }
+    },
+    {
+      "t": 48.0,
+      "action": "set",
+      "path": "accretion_disk",
+      "value": true
+    },
+    {
+      "t": 48.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 52.0,
+      "action": "set",
+      "path": "disk_self_irradiation",
+      "value": false
+    },
+    {
+      "t": 52.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 52.3,
+      "action": "annotation",
+      "note": {
+        "title": "Returning Radiation OFF",
+        "text": "Self-irradiation is disabled to reduce inner-disk reheating and flatten the hottest emission region.",
+        "anchor": {
+          "mode": "world",
+          "target": "disk"
+        },
+        "placement": "auto",
+        "color": "#8ccfff",
+        "width": 330
+      }
+    },
+    {
+      "t": 58.0,
+      "action": "set",
+      "path": "disk_self_irradiation",
+      "value": true
+    },
+    {
+      "t": 58.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 66.0,
+      "action": "set",
+      "path": "accretion_mode",
+      "value": "thick_torus"
+    },
+    {
+      "t": 66.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 66.3,
+      "action": "annotation",
+      "note": {
+        "title": "Thick Torus",
+        "text": "The flow transitions to a geometrically thick, optically thinner torus regime typical of low accretion states.",
+        "anchor": {
+          "mode": "world",
+          "target": "disk"
+        },
+        "placement": "auto",
+        "color": "#70b8ff",
+        "width": 336
+      }
+    },
+    {
+      "t": 76.0,
+      "action": "set",
+      "path": "grmhd.enabled",
+      "value": true
+    },
+    {
+      "t": 76.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 76.3,
+      "action": "annotation",
+      "note": {
+        "title": "GRMHD Layer",
+        "text": "GRMHD-inspired plasma parameters are enabled: electron heating, magnetic structure, turbulence, and MAD flux.",
+        "anchor": {
+          "mode": "world",
+          "target": "disk"
+        },
+        "placement": "auto",
+        "color": "#6ab4ff",
+        "width": 345
+      }
+    },
+    {
+      "t": 82.0,
+      "action": "annotation",
+      "note": {
+        "title": "Parameter Burst Demo",
+        "text": "Quickly sweeping temperature, GRMHD plasma controls, and post-look knobs, then restoring defaults.",
+        "anchor": {
+          "mode": "world",
+          "target": "disk"
+        },
+        "placement": "auto",
+        "color": "#79c1ff",
+        "width": 340
+      }
+    },
+    {
+      "t": 82.05,
+      "action": "set",
+      "path": "disk_temperature",
+      "value": 17000
+    },
+    {
+      "t": 82.06,
+      "action": "set",
+      "path": "grmhd.r_high",
+      "value": 95.0
+    },
+    {
+      "t": 82.07,
+      "action": "set",
+      "path": "grmhd.magnetic_beta",
+      "value": 5.5
+    },
+    {
+      "t": 82.08,
+      "action": "set",
+      "path": "grmhd.mad_flux",
+      "value": 0.7
+    },
+    {
+      "t": 82.09,
+      "action": "set",
+      "path": "grmhd.density_scale",
+      "value": 1.5
+    },
+    {
+      "t": 82.1,
+      "action": "set",
+      "path": "grmhd.turbulence_amp",
+      "value": 1.9
+    },
+    {
+      "t": 82.11,
+      "action": "set",
+      "path": "grmhd.electron_kappa",
+      "value": 3.8
+    },
+    {
+      "t": 82.12,
+      "action": "set",
+      "path": "grmhd.magnetic_field_str",
+      "value": 2.1
+    },
+    {
+      "t": 82.13,
+      "action": "set",
+      "path": "look.disk_gain",
+      "value": 1.45
+    },
+    {
+      "t": 82.14,
+      "action": "set",
+      "path": "look.glow",
+      "value": 0.28
+    },
+    {
+      "t": 82.15,
+      "action": "set",
+      "path": "bloom.strength",
+      "value": 0.55
+    },
+    {
+      "t": 82.16,
+      "action": "set",
+      "path": "bloom.threshold",
+      "value": 0.56
+    },
+    {
+      "t": 82.17,
+      "action": "set",
+      "path": "bloom.radius",
+      "value": 0.96
+    },
+    {
+      "t": 85.4,
+      "action": "set",
+      "path": "disk_temperature",
+      "value": 5000
+    },
+    {
+      "t": 85.41,
+      "action": "set",
+      "path": "grmhd.r_high",
+      "value": 40.0
+    },
+    {
+      "t": 85.42,
+      "action": "set",
+      "path": "grmhd.magnetic_beta",
+      "value": 10.0
+    },
+    {
+      "t": 85.43,
+      "action": "set",
+      "path": "grmhd.mad_flux",
+      "value": 0.0
+    },
+    {
+      "t": 85.44,
+      "action": "set",
+      "path": "grmhd.density_scale",
+      "value": 1.0
+    },
+    {
+      "t": 85.45,
+      "action": "set",
+      "path": "grmhd.turbulence_amp",
+      "value": 1.0
+    },
+    {
+      "t": 85.46,
+      "action": "set",
+      "path": "grmhd.electron_kappa",
+      "value": 5.0
+    },
+    {
+      "t": 85.47,
+      "action": "set",
+      "path": "grmhd.magnetic_field_str",
+      "value": 1.0
+    },
+    {
+      "t": 85.48,
+      "action": "set",
+      "path": "look.disk_gain",
+      "value": 1.0
+    },
+    {
+      "t": 85.49,
+      "action": "set",
+      "path": "look.glow",
+      "value": 0.0
+    },
+    {
+      "t": 85.5,
+      "action": "set",
+      "path": "bloom.strength",
+      "value": 0.35
+    },
+    {
+      "t": 85.51,
+      "action": "set",
+      "path": "bloom.threshold",
+      "value": 0.65
+    },
+    {
+      "t": 85.52,
+      "action": "set",
+      "path": "bloom.radius",
+      "value": 0.85
+    },
+    {
+      "t": 85.7,
+      "action": "annotation",
+      "note": {
+        "title": "Defaults Restored",
+        "text": "The burst is complete. All swept parameters are now back to their default values.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#8fd0ff",
+        "width": 330
+      }
+    },
+    {
+      "t": 88.0,
+      "action": "set",
+      "path": "accretion_mode",
+      "value": "slim_disk"
+    },
+    {
+      "t": 88.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 88.3,
+      "action": "annotation",
+      "note": {
+        "title": "Slim Disk",
+        "text": "Switch to an intermediate puffed disk state to emulate higher accretion rates and hotter inner flow.",
+        "anchor": {
+          "mode": "world",
+          "target": "disk"
+        },
+        "placement": "auto",
+        "color": "#79c1ff",
+        "width": 330
+      }
+    },
+    {
+      "t": 98.0,
+      "action": "set",
+      "path": "accretion_mode",
+      "value": "thin_disk"
+    },
+    {
+      "t": 98.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 100.0,
+      "action": "set",
+      "path": "jet.enabled",
+      "value": true
+    },
+    {
+      "t": 100.0,
+      "action": "set",
+      "path": "jet.mode",
+      "value": "simple"
+    },
+    {
+      "t": 100.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 100.3,
+      "action": "annotation",
+      "note": {
+        "title": "Jet: Simple Model",
+        "text": "A stylized bipolar jet is enabled for clear orientation and first-pass relativistic beaming cues.",
+        "anchor": {
+          "x": 0.52,
+          "y": 0.3
+        },
+        "placement": "auto",
+        "color": "#74bcff",
+        "width": 320
+      }
+    },
+    {
+      "t": 112.0,
+      "action": "set",
+      "path": "jet.mode",
+      "value": "physical"
+    },
+    {
+      "t": 112.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 112.3,
+      "action": "annotation",
+      "note": {
+        "title": "Jet: Physical Model",
+        "text": "The physical jet mode adds spine/sheath behavior, knots, stronger base corona, and GRMHD-driven structure.",
+        "anchor": {
+          "x": 0.52,
+          "y": 0.3
+        },
+        "placement": "auto",
+        "color": "#6cb5ff",
+        "width": 340
+      }
+    },
+    {
+      "t": 118.0,
+      "action": "set",
+      "path": "observer.motion",
+      "value": true
+    },
+    {
+      "t": 118.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 118.3,
+      "action": "annotation",
+      "note": {
+        "title": "Orbital Motion Enabled",
+        "text": "A short moving-observer segment highlights orbital aberration and time-evolving beaming geometry.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#88cdff",
+        "width": 330
+      }
+    },
+    {
+      "t": 120.0,
+      "action": "set",
+      "path": "look.tonemap_mode",
+      "value": 0
+    },
+    {
+      "t": 120.2,
+      "action": "annotation",
+      "note": {
+        "title": "Tone Mapper: ACES",
+        "text": "Filmic highlight roll-off with smooth shoulder response for bright disk cores and jet knots.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#9cd7ff",
+        "width": 320
+      }
+    },
+    {
+      "t": 124.0,
+      "action": "set",
+      "path": "look.tonemap_mode",
+      "value": 2
+    },
+    {
+      "t": 124.2,
+      "action": "annotation",
+      "note": {
+        "title": "Tone Mapper: Scientific Log",
+        "text": "Log mapping reveals faint low-intensity structures useful for analysis-style visualization.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#a7dcff",
+        "width": 320
+      }
+    },
+    {
+      "t": 126.0,
+      "action": "set",
+      "path": "observer.motion",
+      "value": false
+    },
+    {
+      "t": 126.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 128.0,
+      "action": "set",
+      "path": "look.tonemap_mode",
+      "value": 1
+    },
+    {
+      "t": 128.2,
+      "action": "annotation",
+      "note": {
+        "title": "Tone Mapper: AgX",
+        "text": "Back to AgX for stable saturation and contrast through extreme HDR transitions.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#7fc6ff",
+        "width": 300
+      }
+    },
+    {
+      "t": 134.0,
+      "action": "set",
+      "path": "planet.enabled",
+      "value": true
+    },
+    {
+      "t": 134.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 134.3,
+      "action": "annotation",
+      "note": {
+        "title": "Reference Planet",
+        "text": "An orbiting body is added to make lensing distortions and delay effects easier to read at a glance.",
+        "anchor": {
+          "mode": "world",
+          "target": "planet"
+        },
+        "placement": "auto",
+        "color": "#8bd0ff",
+        "width": 335
+      }
+    },
+    {
+      "t": 138.0,
+      "action": "set",
+      "path": "physical_beaming",
+      "value": false
+    },
+    {
+      "t": 138.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 138.3,
+      "action": "annotation",
+      "note": {
+        "title": "Cinematic Beaming Curve",
+        "text": "Physical D^3 transfer is temporarily replaced with a softer curve for comparison.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#99d5ff",
+        "width": 315
+      }
+    },
+    {
+      "t": 144.0,
+      "action": "set",
+      "path": "physical_beaming",
+      "value": true
+    },
+    {
+      "t": 144.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 146.0,
+      "action": "set",
+      "path": "aberration",
+      "value": false
+    },
+    {
+      "t": 146.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 146.3,
+      "action": "annotation",
+      "note": {
+        "title": "Aberration OFF",
+        "text": "Directional warping from observer velocity is removed to isolate other relativistic contributions.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#a7dcff",
+        "width": 320
+      }
+    },
+    {
+      "t": 150.0,
+      "action": "set",
+      "path": "aberration",
+      "value": true
+    },
+    {
+      "t": 150.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 152.0,
+      "action": "set",
+      "path": "observer.motion",
+      "value": false
+    },
+    {
+      "t": 152.02,
+      "action": "updateShader"
+    },
+    {
+      "t": 152.1,
+      "action": "set",
+      "path": "observer.distance",
+      "value": 13.2
+    },
+    {
+      "t": 152.2,
+      "action": "set",
+      "path": "hover.speed",
+      "value": 0.22
+    },
+    {
+      "t": 153.0,
+      "action": "startHover"
+    },
+    {
+      "t": 153.3,
+      "action": "annotation",
+      "note": {
+        "title": "Hover Approach",
+        "text": "Zero-velocity descent isolates gravitational blueshift and near-horizon lensing without orbital Doppler terms.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#74beff",
+        "width": 338
+      }
+    },
+    {
+      "t": 160.0,
+      "action": "pauseHover"
+    },
+    {
+      "t": 161.0,
+      "action": "resetHover"
+    },
+    {
+      "t": 162.0,
+      "action": "set",
+      "path": "observer.distance",
+      "value": 12.8
+    },
+    {
+      "t": 162.1,
+      "action": "set",
+      "path": "dive.speed",
+      "value": 0.48
+    },
+    {
+      "t": 162.2,
+      "action": "set",
+      "path": "dive.cinematic",
+      "value": true
+    },
+    {
+      "t": 163.0,
+      "action": "startDive"
+    },
+    {
+      "t": 163.3,
+      "action": "annotation",
+      "note": {
+        "title": "Freefall Dive",
+        "text": "Radial infall begins with cinematic speed shaping to hold detail around the photon sphere and horizon.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#69b4ff",
+        "width": 336
+      }
+    },
+    {
+      "t": 174.0,
+      "action": "pauseDive"
+    },
+    {
+      "t": 174.2,
+      "action": "annotation",
+      "note": {
+        "title": "Interior Pause",
+        "text": "Hold frame to inspect the shrinking external escape cone and changing interior visual topology.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#8eceff",
+        "width": 330
+      }
+    },
+    {
+      "t": 175.0,
+      "action": "startDive"
+    },
+    {
+      "t": 178.0,
+      "action": "resetDive"
+    },
+    {
+      "t": 178.02,
+      "action": "set",
+      "path": "observer.motion",
+      "value": false
+    },
+    {
+      "t": 178.04,
+      "action": "updateShader"
+    },
+    {
+      "t": 178.3,
+      "action": "annotation",
+      "note": {
+        "title": "Final Composite",
+        "text": "Tour finale: slim disk, GRMHD plasma, physical jet model, reference planet, and full relativistic effects.",
+        "anchor": {
+          "mode": "world",
+          "target": "black_hole"
+        },
+        "placement": "auto",
+        "color": "#70bbff",
+        "width": 344
+      }
+    },
+    {
+      "t": 179.0,
+      "action": "set",
+      "path": "accretion_mode",
+      "value": "slim_disk"
+    },
+    {
+      "t": 179.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 180.0,
+      "action": "set",
+      "path": "grmhd.enabled",
+      "value": true
+    },
+    {
+      "t": 180.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 181.0,
+      "action": "set",
+      "path": "jet.enabled",
+      "value": true
+    },
+    {
+      "t": 181.0,
+      "action": "set",
+      "path": "jet.mode",
+      "value": "physical"
+    },
+    {
+      "t": 181.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 182.0,
+      "action": "set",
+      "path": "planet.enabled",
+      "value": true
+    },
+    {
+      "t": 182.03,
+      "action": "updateShader"
+    },
+    {
+      "t": 184.8,
+      "action": "clearAnnotation"
+    }
+  ]
+}

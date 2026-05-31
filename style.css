@@ -1,0 +1,170 @@
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Variables ── */
+:root {
+  --white:     #ffffff;
+  --white-70:  rgba(255,255,255,0.70);
+  --white-30:  rgba(255,255,255,0.30);
+  --white-12:  rgba(255,255,255,0.12);
+  --accent:    rgba(100,175,255,0.90);
+  --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Base ── */
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  color: var(--white);
+  font-family: var(--font);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ── Custom Cursor ── */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(130,195,255,0.95);
+  transition: width .15s, height .15s, opacity .15s;
+}
+
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(100,175,255,0.45);
+  transition: width .2s, height .2s, opacity .2s;
+}
+
+/* ── WebGL Canvas ── */
+#bh-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+/* ── Nav ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 3rem;
+  pointer-events: all;
+}
+
+.nav-brand {
+  font-size: .85rem;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--white-70);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: .75rem;
+  font-weight: 400;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--white-30);
+  transition: color .25s;
+}
+
+.nav-links a:hover { color: var(--white-70); }
+
+/* ── Hero Center ── */
+.hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .9rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-name {
+  font-size: clamp(3.2rem, 9vw, 8rem);
+  font-weight: 200;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.88);
+  text-shadow:
+    0 0  50px rgba(100,165,255,.25),
+    0 0 120px rgba(100,165,255,.10);
+}
+
+.hero-role {
+  font-size: .78rem;
+  font-weight: 300;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  color: var(--white-30);
+}
+
+/* ── Scroll Cue ── */
+.scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .7rem;
+  padding-bottom: 2.2rem;
+  pointer-events: none;
+}
+
+.scroll-cue span {
+  font-size: .6rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--white-12);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 38px;
+  background: linear-gradient(to bottom, var(--white-12), transparent);
+  animation: scroll-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0%, 100% { opacity: .25; transform: scaleY(.6) translateY(-4px); }
+  50%       { opacity: .9;  transform: scaleY(1)  translateY(0); }
+}
+
+/* ── Sections placeholder ── */
+main {
+  position: relative;
+  min-height: 100vh;
+  background: #000;
+}

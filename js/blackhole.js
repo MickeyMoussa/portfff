@@ -1,0 +1,423 @@
+// ════════════════════════════════════════════════════════════════════════════
+//  Schwarzschild black-hole hero — self-contained WebGL geodesic raytracer.
+//
+//  Faithful, stripped-down port of the reference raytracer (black-hole-master):
+//   • Photon paths integrated via the Binet equation  d²u/dφ² = −u + 1.5u²
+//     (u = 1/r, r_s = 1), leapfrog stepped — exact Schwarzschild null geodesics.
+//   • Thin Shakura-Sunyaev accretion disk in the equatorial plane, with
+//     Keplerian Doppler beaming, limb darkening and advected turbulence.
+//   • Lensed procedural starfield + faint galaxy band for the background sky.
+//   • ACES filmic tonemap.
+//
+//  Everything heavy in the reference (Kerr/GRMHD/jets/planet/presentation/GUI/
+//  OrbitControls/recording, Three.js, jQuery) is intentionally dropped.
+//
+//  Interaction: the cursor gently TILTS the viewpoint (bounded, eased, returns
+//  to centre) so the lensed light arcs and photon ring bend toward the pointer.
+//  It is a parallax look-around, not an orbit.
+// ════════════════════════════════════════════════════════════════════════════
+
+const VERT = `
+attribute vec2 a_pos;
+void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+`;
+
+const FRAG = `
+precision highp float;
+
+uniform vec2  u_res;
+uniform float u_time;
+uniform vec3  u_camPos;   // camera position (r_s units)
+uniform vec3  u_camX;     // right
+uniform vec3  u_camY;     // up
+uniform vec3  u_camZ;     // forward (toward BH)
+uniform float u_fov;      // FOV multiplier = 1/tan(fov/2)
+uniform float u_exposure;
+
+#define PI 3.14159265359
+#define NSTEPS 100
+#define MAX_REV 3.0
+
+const float R_IN   = 3.0;     // ISCO  (3 r_s, Schwarzschild)
+const float R_OUT  = 13.0;    // outer disk edge
+const float DISK_T = 5200.0;  // peak disk temperature (K)
+
+// ── Noise ──────────────────────────────────────────────────────────────────
+float hash12(vec2 p){
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  float a = hash12(i),            b = hash12(i + vec2(1,0));
+  float c = hash12(i + vec2(0,1)), d = hash12(i + vec2(1,1));
+  vec2 u = f*f*(3.0 - 2.0*f);
+  return mix(mix(a,b,u.x), mix(c,d,u.x), u.y);
+}
+float fbm(vec2 p){
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++){ s += a*vnoise(p); p = p*2.03 + vec2(17.13,-11.7); a *= 0.5; }
+  return s;
+}
+
+// ── Blackbody colour (Tanner Helland approximation), temperature in Kelvin ──
+vec3 blackbody(float t){
+  t = clamp(t, 1000.0, 40000.0) / 100.0;
+  float r, g, b;
+  if (t <= 66.0){
+    r = 1.0;
+    g = clamp(0.3900815788*log(t) - 0.6318414438, 0.0, 1.0);
+  } else {
+    r = clamp(1.292936186*pow(t - 60.0, -0.1332047592), 0.0, 1.0);
+    g = clamp(1.129890861*pow(t - 60.0, -0.0755148492), 0.0, 1.0);
+  }
+  if (t >= 66.0)      b = 1.0;
+  else if (t <= 19.0) b = 0.0;
+  else                b = clamp(0.5432067891*log(t - 10.0) - 1.196254089, 0.0, 1.0);
+  return vec3(r, g, b);
+}
+
+// ── Background sky (sampled along the escaped ray direction) ────────────────
+vec3 starfield(vec3 dir){
+  vec2 uv = vec2(atan(dir.y, dir.x), asin(clamp(dir.z, -1.0, 1.0)));
+  vec3 col = vec3(0.0);
+
+  // faint nebula
+  vec2 np = uv * vec2(1.5, 3.0);
+  float n1 = fbm(np*2.0 + vec2(0.0, u_time*0.003));
+  float n2 = fbm(np*5.0 + 11.0);
+  col += vec3(0.012, 0.016, 0.045) * pow(n1, 2.0);
+  col += vec3(0.050, 0.020, 0.060) * pow(n2, 3.0) * 0.5;
+
+  // faint galaxy band hugging the equatorial plane
+  float band = exp(-dir.z*dir.z * 7.0);
+  col += vec3(0.030, 0.045, 0.080) * band * pow(fbm(np*1.2 + 5.0), 2.0) * 0.6;
+
+  // layered stars
+  for (int k = 0; k < 3; k++){
+    float sc   = 90.0 + float(k)*150.0;
+    vec2  g    = uv * sc;
+    vec2  cell = floor(g);
+    float h    = hash12(cell + float(k)*37.0);
+    if (h > 0.93){
+      vec2  c  = cell + vec2(hash12(cell + 1.3), hash12(cell + 2.7));
+      float d  = length(g - c);
+      float tw = 0.6 + 0.4*sin(u_time*3.0 + h*60.0);
+      float s  = smoothstep(0.5, 0.0, d) * (h - 0.93)/0.07;
+      col += vec3(0.90, 0.95, 1.00) * s * tw * 1.1;
+    }
+  }
+  return col;
+}
+
+void main(){
+  // y-normalised, centred screen coordinates
+  vec2 p   = (2.0*gl_FragCoord.xy - u_res) / u_res.y;
+  vec3 ray = normalize(p.x*u_camX + p.y*u_camY + u_fov*u_camZ);
+  vec3 pos = u_camPos;
+
+  // ── Binet initial conditions in the photon's orbital plane ──
+  float u  = 1.0 / length(pos);
+  vec3  nv = normalize(pos);                 // radial unit
+  vec3  rp = cross(cross(nv, ray), nv);      // tangential component of ray
+  float rl = length(rp);
+  vec3  tv;
+  if (rl > 1e-6) tv = rp / rl;
+  else {
+    vec3 hlp = abs(nv.z) < 0.9 ? vec3(0,0,1) : vec3(1,0,0);
+    tv = normalize(cross(nv, hlp));
+  }
+  float lapse  = sqrt(max(1.0 - u, 1e-4));   // static-observer radial compression
+  float radial = dot(ray, nv) * lapse;
+  float dtan   = dot(ray, tv);
+  float du     = (abs(dtan) > 1e-6) ? -radial/dtan * u
+                                    : -sign(dot(ray, nv)) * u * 50.0;
+  float phi = 0.0;
+
+  vec3  color    = vec3(0.0);
+  bool  captured = false;
+  vec3  old_pos  = pos;
+
+  for (int i = 0; i < NSTEPS; i++){
+    float step = MAX_REV * 2.0*PI / float(NSTEPS);
+    // refine near the photon sphere (u = 2/3) where paths wind tightly
+    float ps = exp(-12.0*(u - 0.667)*(u - 0.667));
+    step *= 1.0 - 0.7*ps;
+    // keep u strictly positive when it is decreasing fast
+    if (du*step < -0.7*u) step = -0.7*u/du;
+
+    old_pos = pos;
+
+    // leapfrog integrate the Binet equation
+    du += 0.5*(-u + 1.5*u*u)*step;
+    u  += du*step;
+    du += 0.5*(-u + 1.5*u*u)*step;
+
+    if (u >= 1.0){ captured = true; break; }   // crossed the event horizon
+    u = max(u, 1e-4);
+
+    phi += step;
+    pos  = (cos(phi)*nv + sin(phi)*tv) / u;
+    vec3 seg = pos - old_pos;
+
+    // ── Accretion-disk crossing (z = 0), sub-stepped near the photon sphere ──
+    int  subs = (abs(u - 0.667) < 0.15 && step > 0.12) ? 4 : 1;
+    vec3 so   = old_pos;
+    vec3 sv   = seg / float(subs);
+    for (int ds = 0; ds < 4; ds++){
+      if (ds >= subs) break;
+      vec3 sn = old_pos + sv*float(ds + 1);
+      if (so.z * sn.z < 0.0){
+        float tc   = -so.z / (sn.z - so.z);
+        vec3  isec = so + (sn - so)*tc;
+        float r    = length(isec);
+        if (r > R_IN && r < R_OUT){
+          float ang   = atan(isec.y, isec.x);
+          float x     = max(r/R_IN, 1.0001);
+          float inner = max(1.0 - sqrt(1.0/x), 0.02);
+
+          // Shakura-Sunyaev temperature + flux
+          float temp = DISK_T * 2.05 * pow(1.0/x, 0.75) * pow(inner, 0.25);
+          float flux = inner / (x*x*x) * 18.0;
+
+          // turbulence advected by the Keplerian flow
+          float orbit = ang - 0.5*u_time / pow(max(r, 1.001), 1.5);
+          vec2  ou    = vec2(cos(orbit), sin(orbit));
+          float turb  = fbm(vec2(r*2.5 + ou.x*4.5, ou.y*4.5 + u_time*0.05)) * 0.7
+                      + fbm(vec2(r*9.0 + ou.x*12.0, ou.y*12.0 - u_time*0.12)) * 0.3;
+          turb = 0.5 + 1.0*turb;
+
+          // soft inner / outer edges
+          float rn   = (r - R_IN)/(R_OUT - R_IN);
+          float fade = smoothstep(0.0, 0.12, rn) * (1.0 - smoothstep(0.72, 1.0, rn));
+
+          float intensity = flux * turb * fade;
+
+          // relativistic Doppler beaming (prograde Keplerian orbit)
+          float vmag = 1.0 / sqrt(2.0*max(r - 1.0, 0.05));
+          vec3  vel  = vmag * vec3(-isec.y, isec.x, 0.0) / r;
+          float gam  = 1.0 / sqrt(max(1.0 - dot(vel, vel), 1e-3));
+          vec3  sdir = seg / max(length(seg), 1e-6);
+          float dop  = clamp(gam*(1.0 + dot(sdir, vel)), 0.6, 1.5);
+          intensity /= pow(dop, 1.4);
+          temp      /= dop;
+
+          // limb darkening + inner glow
+          float cosa = abs(seg.z) / max(length(seg), 1e-6);
+          intensity *= 0.4 + 0.6*cosa;
+          intensity *= 1.0 + 0.7*exp(-8.0*(r - R_IN));
+
+          color += blackbody(temp) * intensity * 0.95;
+        }
+      }
+      so = sn;
+    }
+
+    // escaped to the far field → stop and sample the background
+    if (u < 0.03 && du < 0.0) break;
+  }
+
+  if (!captured) color += starfield(normalize(pos - old_pos));
+
+  // ── Tonemap + grade ──
+  color *= u_exposure;
+  color  = clamp((color*(2.51*color + 0.03)) / (color*(2.43*color + 0.59) + 0.14), 0.0, 1.0);
+  color  = pow(color, vec3(1.0/2.2));
+
+  vec2 vc = gl_FragCoord.xy/u_res * 2.0 - 1.0;
+  color *= 1.0 - dot(vc, vc) * 0.18;     // vignette
+
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+// ─── Small vec3 helpers (column-major, world space) ───────────────────────────
+const v = {
+  sub: (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]],
+  cross: (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]],
+  norm: (a) => { const l = Math.hypot(a[0],a[1],a[2]) || 1; return [a[0]/l, a[1]/l, a[2]/l]; },
+};
+
+// ─── Renderer ─────────────────────────────────────────────────────────────────
+class BlackHole {
+  constructor() {
+    this.canvas = document.getElementById('bh-canvas');
+
+    // Camera framing (r_s units). Nearly edge-on → the signature warped-disk look.
+    this.DIST = 9.0;          // observer distance
+    this.FOV  = 1.8;          // 1/tan(fov/2) ≈ 58° vertical FOV
+    this.EXPO = 1.15;
+
+    this.AZ0  = 0.0;          // base azimuth
+    this.EL0  = 0.11;         // base elevation (~6.3° above the disk plane)
+    this.AZ_AMP = 0.16;       // cursor azimuth swing (~9°)
+    this.EL_AMP = 0.10;       // cursor elevation swing (~5.7°)
+
+    this.az = this.AZ0;  this.el = this.EL0;     // current (eased)
+    this.azT = this.AZ0; this.elT = this.EL0;    // target (from cursor)
+
+    this.time = 0; this.last = 0;
+    this.scale = 1.0;            // adaptive resolution scale
+    this.frameEMA = 16;         // ms, exponential moving average
+    this.scaleCooldown = 0;
+    this.visible = true;
+
+    this._initGL();
+    this._initCursor();
+    this._initVisibility();
+
+    window.addEventListener('resize', () => this._resize());
+    requestAnimationFrame(t => this._loop(t));
+  }
+
+  _initGL() {
+    const gl = this.canvas.getContext('webgl', { antialias: false, alpha: false,
+                                                 powerPreference: 'high-performance' })
+            || this.canvas.getContext('experimental-webgl');
+    if (!gl) { console.error('WebGL unavailable'); document.body.classList.add('no-webgl'); return; }
+    this.gl = gl;
+
+    const prog = gl.createProgram();
+    [[gl.VERTEX_SHADER, VERT], [gl.FRAGMENT_SHADER, FRAG]].forEach(([type, src]) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        console.error('Shader compile:', gl.getShaderInfoLog(s));
+      gl.attachShader(prog, s);
+    });
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS))
+      console.error('Program link:', gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    this.prog = prog;
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    this.u = {
+      res:      gl.getUniformLocation(prog, 'u_res'),
+      time:     gl.getUniformLocation(prog, 'u_time'),
+      camPos:   gl.getUniformLocation(prog, 'u_camPos'),
+      camX:     gl.getUniformLocation(prog, 'u_camX'),
+      camY:     gl.getUniformLocation(prog, 'u_camY'),
+      camZ:     gl.getUniformLocation(prog, 'u_camZ'),
+      fov:      gl.getUniformLocation(prog, 'u_fov'),
+      exposure: gl.getUniformLocation(prog, 'u_exposure'),
+    };
+    gl.uniform1f(this.u.fov, this.FOV);
+    gl.uniform1f(this.u.exposure, this.EXPO);
+
+    this._resize();
+  }
+
+  _resize() {
+    if (!this.gl) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * this.scale;
+    const w = Math.max(1, Math.round(innerWidth  * dpr));
+    const h = Math.max(1, Math.round(innerHeight * dpr));
+    if (this.canvas.width !== w || this.canvas.height !== h) {
+      this.canvas.width = w; this.canvas.height = h;
+      this.gl.viewport(0, 0, w, h);
+    }
+    this.canvas.style.width  = innerWidth  + 'px';
+    this.canvas.style.height = innerHeight + 'px';
+  }
+
+  // Build the camera basis: position on a sphere of radius DIST at (az, el),
+  // looking at the origin, world-up = +z.
+  _camera() {
+    const ce = Math.cos(this.el), se = Math.sin(this.el);
+    const ca = Math.cos(this.az), sa = Math.sin(this.az);
+    const pos = [this.DIST*ce*ca, this.DIST*ce*sa, this.DIST*se];
+    const fwd = v.norm([-pos[0], -pos[1], -pos[2]]);           // toward BH
+    const up  = [0, 0, 1];
+    const right = v.norm(v.cross(fwd, up));
+    const camUp = v.cross(right, fwd);
+    return { pos, x: right, y: camUp, z: fwd };
+  }
+
+  _initCursor() {
+    const dot  = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let rx = innerWidth/2, ry = innerHeight/2;
+
+    window.addEventListener('mousemove', e => {
+      if (dot)  { dot.style.left = e.clientX + 'px';  dot.style.top = e.clientY + 'px'; }
+      // normalise cursor to [-1, 1]; drive the parallax targets
+      const mx = (e.clientX / innerWidth)  * 2 - 1;
+      const my = (e.clientY / innerHeight) * 2 - 1;
+      this.azT = this.AZ0 + mx * this.AZ_AMP;
+      this.elT = Math.max(0.04, Math.min(0.32, this.EL0 - my * this.EL_AMP));
+    }, { passive: true });
+
+    if (dot && ring) {
+      const tick = () => {
+        const dx = parseFloat(dot.style.left) || innerWidth/2;
+        const dy = parseFloat(dot.style.top)  || innerHeight/2;
+        rx += (dx - rx) * 0.15;  ry += (dy - ry) * 0.15;
+        ring.style.left = rx + 'px';  ring.style.top = ry + 'px';
+        requestAnimationFrame(tick);
+      };
+      tick();
+    }
+  }
+
+  _initVisibility() {
+    const hero = document.getElementById('hero') || this.canvas;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        es => { this.visible = es[0].isIntersecting; },
+        { threshold: 0.01 }
+      ).observe(hero);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.visible = false;
+    });
+  }
+
+  _adaptResolution(ms) {
+    this.frameEMA += (ms - this.frameEMA) * 0.05;
+    if (this.scaleCooldown > 0) { this.scaleCooldown--; return; }
+    if (this.frameEMA > 23 && this.scale > 0.62) {
+      this.scale = Math.max(0.6, this.scale - 0.12);
+      this.scaleCooldown = 90; this._resize();
+    } else if (this.frameEMA < 13 && this.scale < 1.0) {
+      this.scale = Math.min(1.0, this.scale + 0.12);
+      this.scaleCooldown = 90; this._resize();
+    }
+  }
+
+  _loop(ts) {
+    const dt = Math.min((ts - this.last) * 0.001, 0.05);
+    if (this.last) this._adaptResolution((ts - this.last));
+    this.last = ts;
+
+    requestAnimationFrame(t => this._loop(t));
+    if (!this.visible || !this.gl) return;
+
+    this.time += dt;
+
+    // ease the eased camera angles toward the cursor targets
+    const s = 1 - Math.exp(-dt * 4.5);
+    this.az += (this.azT - this.az) * s;
+    this.el += (this.elT - this.el) * s;
+
+    const cam = this._camera();
+    const gl = this.gl;
+    gl.uniform2f(this.u.res, this.canvas.width, this.canvas.height);
+    gl.uniform1f(this.u.time, this.time);
+    gl.uniform3fv(this.u.camPos, cam.pos);
+    gl.uniform3fv(this.u.camX, cam.x);
+    gl.uniform3fv(this.u.camY, cam.y);
+    gl.uniform3fv(this.u.camZ, cam.z);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => new BlackHole());
