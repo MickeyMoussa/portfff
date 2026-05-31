@@ -666,3 +666,196 @@ main {
   .rec-bar-fill { animation: none; }
   .rec-btn { transition: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Experience slide — Gaming+ (backdrop mirrors gamingplus.gg)
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --gp-crimson: #ec0144;
+  --gp-magenta: #cb01b6;
+  --gp-gold:    #f5c76a;
+}
+
+.gplus {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3.5rem, 9vh, 7rem) clamp(1.2rem, 5vw, 4rem);
+  scroll-snap-align: start;
+  /* crimson/magenta/gold glows + line grid + dot grid over near-black */
+  background-color: #0a0a13;
+  background-image:
+    radial-gradient(900px circle at 18% 2%,   rgba(236,1,68,0.20),   transparent 60%),
+    radial-gradient(820px circle at 86% 16%,  rgba(203,1,182,0.18),  transparent 60%),
+    radial-gradient(760px circle at 50% 118%, rgba(245,199,106,0.12),transparent 70%),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0),
+    linear-gradient(180deg, #05060b 0%, #0b0b16 45%, #0a0a13 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 120px 100%, 4px 4px, 100% 100%;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+}
+/* bottom vignette to ground the slide */
+.gplus::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(1200px circle at 50% 125%, rgba(0,0,0,0.85), transparent 58%);
+}
+
+/* ── Drifting crimson / purple stage lights ── */
+.gplus-fx {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden; pointer-events: none;
+}
+.gplus-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  mix-blend-mode: screen;     /* additive glow over the near-black field */
+  opacity: .55;
+  will-change: transform;
+}
+.gplus-orb--red {
+  width: 46vw; height: 46vw; max-width: 640px; max-height: 640px;
+  top: -10%; left: -10%;
+  background: radial-gradient(circle, rgba(236,1,68,0.90), rgba(236,1,68,0) 68%);
+  animation: gp-drift-red 26s ease-in-out infinite;
+}
+.gplus-orb--purple {
+  width: 44vw; height: 44vw; max-width: 600px; max-height: 600px;
+  bottom: -14%; right: -10%;
+  background: radial-gradient(circle, rgba(203,1,182,0.85), rgba(203,1,182,0) 68%);
+  animation: gp-drift-purple 32s ease-in-out infinite;
+}
+.gplus-orb--pink {
+  width: 34vw; height: 34vw; max-width: 460px; max-height: 460px;
+  top: 30%; left: 42%;
+  background: radial-gradient(circle, rgba(255,36,145,0.60), rgba(255,36,145,0) 70%);
+  animation: gp-drift-pink 29s ease-in-out infinite;
+}
+@keyframes gp-drift-red {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(22vw, 16vh) scale(1.18); }
+  66%      { transform: translate(8vw, 34vh)  scale(0.95); }
+}
+@keyframes gp-drift-purple {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(-26vw, -12vh) scale(1.20); }
+  70%      { transform: translate(-10vw, -30vh) scale(0.90); }
+}
+@keyframes gp-drift-pink {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-18vw, 12vh) scale(1.25); }
+}
+
+.gplus-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1060px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+/* Centred intro paragraph at the top of the slide */
+.gplus-intro {
+  max-width: 72ch;
+  text-align: center;
+  font-size: clamp(.92rem, 1.4vw, 1.1rem);
+  line-height: 1.85;
+  color: var(--white-70);
+}
+
+/* logo (left) + role progression (right) */
+.gplus-body {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(210px, 0.85fr) 1.15fr;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+
+/* ── Left: logo + link ── */
+.gplus-left { display: flex; flex-direction: column; gap: 1.2rem; }
+.gplus-logo-link { pointer-events: auto; align-self: flex-start; cursor: none; }
+.gplus-logo {
+  width: clamp(190px, 24vw, 300px);
+  height: auto;
+  filter: drop-shadow(0 6px 30px rgba(236,1,68,0.35));
+  transition: filter .3s, transform .3s;
+}
+.gplus-logo-link:hover .gplus-logo {
+  filter: drop-shadow(0 8px 42px rgba(236,1,68,0.6));
+  transform: translateY(-2px);
+}
+.gplus-tag {
+  font-size: .92rem;
+  line-height: 1.6;
+  color: var(--white-70);
+  max-width: 26ch;
+}
+.gplus-link {
+  align-self: flex-start;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gp-crimson);
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(236,1,68,0.4);
+  transition: color .25s, border-color .25s;
+}
+.gplus-link:hover { color: #ff4d80; border-color: #ff4d80; }
+
+/* ── Right: role progression ── */
+.gplus-eyebrow {
+  display: block;
+  font-size: .64rem; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--gp-gold);
+  margin-bottom: 1.6rem;
+}
+.gplus-roles {
+  list-style: none;
+  position: relative;
+  display: flex; flex-direction: column;
+  gap: 1.7rem;
+}
+/* vertical progression line through the step markers */
+.gplus-roles::before {
+  content: ""; position: absolute; left: 11px; top: 8px; bottom: 12px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--gp-crimson), var(--gp-magenta), transparent);
+  opacity: .55;
+}
+.gplus-role { position: relative; padding-left: 2.6rem; }
+.gplus-role-step {
+  position: absolute; left: 0; top: 1px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem; font-weight: 700; color: #fff;
+  background: radial-gradient(circle at 30% 30%, rgba(236,1,68,0.95), rgba(203,1,182,0.9));
+  box-shadow: 0 0 0 4px #0a0a13, 0 0 18px rgba(236,1,68,0.5);   /* mask the line + glow */
+}
+.gplus-role-title {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: #fff;
+  margin-bottom: .3rem;
+}
+.gplus-role-text {
+  font-size: .9rem;
+  line-height: 1.6;
+  color: var(--white-70);
+  max-width: 46ch;
+}
+
+@media (max-width: 760px) {
+  .gplus-body { grid-template-columns: 1fr; gap: 2.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gplus-logo { transition: none; }
+  .gplus-orb { animation: none; }
+}
