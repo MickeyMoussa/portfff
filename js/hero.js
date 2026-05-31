@@ -61,3 +61,19 @@
     });
   }, 550);
 })();
+
+// ─── Brand reveal ─────────────────────────────────────────────────────────────
+//  يزيد فارس surfaces once the hero (black-hole) section is mostly scrolled past,
+//  and hides again when you return to it.
+(function () {
+  const hero  = document.getElementById('hero');
+  const brand = document.getElementById('brand');
+  if (!hero || !brand) return;
+
+  if (!('IntersectionObserver' in window)) { brand.classList.add('is-shown'); return; }
+
+  new IntersectionObserver(
+    entries => brand.classList.toggle('is-shown', entries[0].intersectionRatio < 0.35),
+    { threshold: [0, 0.35, 1] }
+  ).observe(hero);
+})();

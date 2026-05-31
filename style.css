@@ -13,12 +13,18 @@
 
 /* ── Base ── */
 html, body {
-  width: 100%; height: 100%;
+  width: 100%;
   background: #000;
   color: var(--white);
   font-family: var(--font);
   overflow-x: hidden;
   cursor: none;
+}
+
+/* Smooth-scroll to #about from the CTA; gentle snap to each full-height slide. */
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -68,15 +74,49 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   justify-content: space-between;
   pointer-events: none;
+  scroll-snap-align: start;
 }
 
 /* ── Nav ── */
 .nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;   /* links sit right; brand is a separate fixed element */
   padding: 2rem 3rem;
   pointer-events: all;
+}
+
+/* Brand (يزيد فارس) — fixed top-right, hidden over the hero, surfaces after it.
+   The fade + de-blur + slight rise reads as if it was sitting under the
+   black hole and rises into view once you scroll past it. */
+.brand {
+  position: fixed;
+  top: 1.7rem;
+  right: 2.4rem;
+  z-index: 50;
+  font-family: 'Tajawal', var(--font);
+  font-weight: 800;
+  font-size: clamp(1.15rem, 2.1vw, 1.55rem);
+  letter-spacing: .01em;
+  color: rgba(255, 255, 255, .94);
+  direction: rtl;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(7px);
+  transition: opacity .7s ease, transform .7s ease, filter .7s ease, color .3s ease;
+  text-shadow: 0 0 22px rgba(120, 185, 255, .30);
+}
+.brand.is-shown {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+  pointer-events: auto;
+}
+.brand:hover { color: #cfe6ff; }
+
+@media (max-width: 540px) {
+  .brand { top: 1.2rem; right: 1.3rem; }
 }
 
 .nav-brand {
@@ -238,9 +278,94 @@ a { color: inherit; text-decoration: none; }
   50%       { opacity: .9;  transform: scaleY(1)  translateY(0); }
 }
 
-/* ── Sections placeholder ── */
+/* ── Sections ── */
 main {
   position: relative;
+  background: #050407;          /* deep space behind the slides */
+  z-index: 1;                   /* sit above the fixed black-hole canvas */
+}
+
+/* About — black "slide": centred date + title, paragraph left, photo right */
+.about {
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 8vh, 7rem) clamp(1.2rem, 5vw, 4rem);
   background: #000;
+  scroll-snap-align: start;
+}
+
+.about-slide {
+  width: min(1000px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.6rem);
+}
+
+/* Centred header */
+.about-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .9rem;
+  text-align: center;
+}
+.about-date {
+  font-size: .8rem;
+  font-weight: 400;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: #e79bff;                          /* space pink/purple */
+}
+.about-title {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 300;
+  letter-spacing: .04em;
+  color: #e79bff;                          /* space pink/purple */
+  text-shadow: 0 0 40px rgba(190, 110, 255, .25);
+}
+
+/* Paragraph (left) + photo (right) */
+.about-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+.about-text { flex: 0 1 480px; }
+.about-body {
+  max-width: 52ch;
+  font-size: clamp(1.02rem, 1.5vw, 1.18rem);
+  font-weight: 400;
+  line-height: 1.8;
+  color: rgba(130, 195, 255, 0.95);        /* same blue as the hero CTAs */
+}
+/* highlighted orgs — same pink as the date/title */
+.about-body .hl {
+  color: #e79bff;
+  font-weight: 500;
+}
+
+.about-photo {
+  flex: 0 0 auto;
+  width: clamp(240px, 34%, 360px);
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #1a1530, #0d0a18);  /* placeholder until photo loads */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.about-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;     /* favour the face on crop */
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .about-row { flex-direction: column; }
+  .about-photo { order: -1; width: min(280px, 72%); }
 }

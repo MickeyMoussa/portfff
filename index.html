@@ -6,7 +6,7 @@
   <title>Yazeed — Researcher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,9 +15,11 @@
 
   <canvas id="bh-canvas"></canvas>
 
+  <!-- Brand: surfaces only after the black-hole (hero) section -->
+  <a class="brand" id="brand" href="#hero" aria-label="Yazeed Faris">يزيد فارس</a>
+
   <header class="hero" id="hero">
     <nav class="nav">
-      <span class="nav-brand">Y.</span>
       <ul class="nav-links">
         <li><a href="#research">Research</a></li>
         <li><a href="#projects">Projects</a></li>
@@ -31,7 +33,7 @@
       </h1>
       <nav class="hero-cta" id="hero-cta" aria-label="Primary">
         <a class="cta" href="#about"><span>about me</span></a>
-        <a class="cta" href="#projects"><span>some of my works</span></a>
+        <a class="cta" href="#projects"><span>some of my work</span></a>
       </nav>
     </div>
 
@@ -41,8 +43,28 @@
     </div>
   </header>
 
-  <!-- ── Future sections live below ── -->
-  <main id="research">
+  <!-- ───────────────  About  ─────────────── -->
+  <main>
+    <section class="about" id="about">
+      <div class="about-slide">
+        <header class="about-head">
+          <span class="about-date">01 Mar 2026</span>
+          <h2 class="about-title">about me</h2>
+        </header>
+        <div class="about-row">
+          <div class="about-text">
+            <p class="about-body">
+              I'm a senior CS student at <span class="hl">KFUPM</span> with a concentration in AI &amp; ML.
+              Outside of class, I actively pursue a fellowship by the <span class="hl">Society of Actuaries (SOA)</span> in actuarial science, which is basically math &amp; statistics for quantifying risk and uncertainty.
+              Although these may sound as different domains, machine learning and actuarial science are just probabilistic math at the end of the day. I've worked previously as a researcher at the <span class="hl">Saudi Data and AI Authority (SDAIA)</span> and as a backend engineer at <span class="hl">Gaming+</span>. <br><br> Got an idea? Pls get in touch — I would be happy to collaborate :)
+            </p>
+          </div>
+          <div class="about-photo">
+            <img src="assets/images/me.png" alt="Yazeed" onerror="this.style.display='none'">
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="js/blackhole.js"></script>
