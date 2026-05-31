@@ -65,9 +65,49 @@
         </div>
       </div>
     </section>
+
+    <!-- ───────────────  Research — SDAIA actuarial ML  ─────────────── -->
+    <section class="research" id="research">
+      <div class="research-slide">
+        <header class="research-head">
+          <span class="research-date">SDAIA · KFUPM JRC for AI</span>
+          <h2 class="research-title">actuarial machine learning</h2>
+          <p class="research-sub">A Two-Tower Content-Based Neural Network for Healthcare Plan Recommendation</p>
+        </header>
+
+        <p class="research-body">
+          Traditional actuarial risk leans on <span class="hl">unimodal data</span> and linear risk pools.
+          I modelled it instead as the interaction of <span class="hl">two vectors</span> — a policyholder's
+          traits and an insurance plan's characteristics — with a two-tower neural network that predicts
+          <span class="hl">expected coverage at the micro-level</span> across 407 benefit types.
+          It's a research project, so there's no product link — instead, the model I trained is running
+          <span class="hl">live, right here in your browser</span>.
+        </p>
+
+        <div class="rec">
+          <div class="rec-controls">
+            <button id="rec-run" class="rec-btn" type="button">
+              <span>Run a randomized trial</span>
+            </button>
+            <span id="rec-status" class="rec-status" hidden></span>
+          </div>
+
+          <div id="rec-profile" class="rec-profile"></div>
+          <div id="rec-results" class="rec-results" hidden></div>
+        </div>
+
+        <p class="research-note">
+          A random policyholder is drawn and scored against a sample of real ACA marketplace plans. Each
+          plan's <em>coverage-match score</em> is the model's summed softmax probability over the benefits
+          that plan actually covers — best vs. worst shows how much coverage the network recovers. Inference
+          runs entirely client-side from an int8-quantized bundle, within 0.0016 of the original model.
+        </p>
+      </div>
+    </section>
   </main>
 
   <script src="js/blackhole.js"></script>
   <script src="js/hero.js"></script>
+  <script src="js/recommender.js"></script>
 </body>
 </html>

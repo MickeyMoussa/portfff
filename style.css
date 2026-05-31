@@ -369,3 +369,300 @@ main {
   .about-row { flex-direction: column; }
   .about-photo { order: -1; width: min(280px, 72%); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Research slide — SDAIA actuarial ML (space-pink theme)
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --pink:      #e79bff;
+  --pink-soft: rgba(231, 155, 255, .55);
+  --pink-glow: rgba(190, 110, 255, .25);
+  /* ── Research slide palette: PINK field · BLUE accent · WHITE + dark ink ──
+     Text that sits directly on the pink uses a deep navy ink for contrast;
+     the dark glass cards carry the blue + white we use elsewhere. */
+  --rs-ink:       #15173a;                   /* deep navy: body text on pink   */
+  --rs-ink-dim:   rgba(21, 23, 58, .74);
+  --rs-ink-faint: rgba(21, 23, 58, .52);
+  --rs-line:      rgba(21, 23, 58, .22);
+  --rs-blue:      #1d3f7c;                    /* deep blue: labels/fills on pink*/
+  --rs-blue-lt:   rgba(130, 195, 255, .96);   /* light blue: text on dark cards */
+}
+
+.research {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3.5rem, 9vh, 7rem) clamp(1.2rem, 5vw, 4rem);
+  background: var(--pink);          /* solid pink field */
+  scroll-snap-align: start;
+}
+
+.research-slide {
+  width: min(1040px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 4vw, 2.6rem);
+}
+
+/* Centred header — mirrors the about slide, pink accent */
+.research-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .8rem;
+  text-align: center;
+}
+.research-date {
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--rs-blue);                 /* blue label on pink */
+}
+.research-title {
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 300;
+  letter-spacing: .04em;
+  color: #fff;                            /* white display title */
+  text-shadow: 0 2px 30px rgba(40, 12, 48, .35);
+}
+.research-sub {
+  max-width: 46ch;
+  font-size: clamp(.92rem, 1.4vw, 1.05rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--rs-ink-dim);
+}
+
+.research-body {
+  max-width: 64ch;
+  margin: 0 auto;
+  text-align: center;
+  font-size: clamp(1rem, 1.45vw, 1.16rem);
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--rs-ink);                   /* deep navy on pink */
+}
+.research-body .hl { color: var(--rs-blue); font-weight: 600; }
+
+.research-note {
+  max-width: 70ch;
+  margin: 0 auto;
+  text-align: center;
+  font-size: .78rem;
+  line-height: 1.7;
+  color: var(--rs-ink-faint);
+}
+.research-note em { color: var(--rs-ink-dim); font-style: normal; }
+
+/* ── Demo shell ── */
+.rec { display: flex; flex-direction: column; gap: 1.4rem; }
+
+.rec-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.rec-btn {
+  appearance: none;
+  background: linear-gradient(180deg, #2b539e, #1d3f7c);
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: .85rem 1.8rem;
+  border-radius: 999px;
+  cursor: none;
+  box-shadow: 0 10px 30px rgba(21, 23, 58, .35), inset 0 1px 0 rgba(255,255,255,.18);
+  transition: transform .25s, box-shadow .35s, filter .25s;
+}
+.rec-btn:hover:not(:disabled),
+.rec-btn:focus-visible:not(:disabled) {
+  outline: none;
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  box-shadow: 0 16px 44px rgba(21, 23, 58, .45), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.rec-btn:disabled { opacity: .55; }
+
+.rec-status {
+  font-size: .74rem;
+  letter-spacing: .06em;
+  color: var(--rs-ink-dim);
+}
+
+/* ── Policyholder profile chips ── */
+.rec-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+}
+.rec-profile:empty { display: none; }
+.rec-profile-head {
+  width: 100%;
+  text-align: center;
+  font-size: .64rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--rs-blue);
+  margin-bottom: .2rem;
+}
+.rec-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .5rem;
+  padding: .42rem .85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(21, 23, 58, .22);
+  background: rgba(255, 255, 255, .28);
+  font-size: .8rem;
+  color: var(--rs-ink);
+}
+.rec-chip-k {
+  font-size: .58rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--rs-ink-faint);
+}
+
+/* ── Results ── */
+.rec-results { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.rec-spotlight {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+.rec-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1.3rem 1.4rem;
+  border-radius: 16px;
+  border: 1px solid rgba(130, 195, 255, .16);
+  background: linear-gradient(160deg, #131634, #0d1027);   /* deep navy glass */
+  box-shadow: 0 18px 44px rgba(21, 23, 58, .4);
+  overflow: hidden;
+}
+.rec-card--best {
+  border-color: var(--pink-soft);                          /* pink ties to field */
+  background: linear-gradient(160deg, #1a1d44, #101230);
+  box-shadow: 0 24px 64px rgba(190, 110, 255, .4), inset 0 0 40px rgba(231, 155, 255, .07);
+}
+.rec-card-tag {
+  font-size: .58rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .42);
+}
+.rec-card--best .rec-card-tag { color: var(--pink); }
+.rec-card-metal {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: .02em;
+  color: #fff;
+}
+.rec-card-meta { font-size: .78rem; color: rgba(255, 255, 255, .68); }
+
+.rec-card-score { display: flex; align-items: baseline; gap: .5rem; margin-top: .3rem; }
+.rec-score-num {
+  font-size: 2.1rem;
+  font-weight: 200;
+  color: var(--rs-blue-lt);                                /* light blue data */
+}
+.rec-card--best .rec-score-num { color: #fff; text-shadow: 0 0 26px var(--pink-glow); }
+.rec-score-unit {
+  font-size: .6rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .4);
+}
+
+.rec-card-benefits { margin-top: .5rem; }
+.rec-card-benefits > span {
+  font-size: .58rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .4);
+}
+.rec-card-benefits ul {
+  list-style: none;
+  margin-top: .45rem;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+.rec-card-benefits li {
+  font-size: .82rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .72);
+  padding-left: .9rem;
+  position: relative;
+}
+.rec-card-benefits li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: .55em;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--rs-blue-lt);
+}
+
+/* ── Value callout (on the pink field) ── */
+.rec-lift {
+  text-align: center;
+  font-size: clamp(.92rem, 1.4vw, 1.08rem);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--rs-ink-dim);
+  padding: 1rem 1.2rem;
+  border-top: 1px solid var(--rs-line);
+  border-bottom: 1px solid var(--rs-line);
+}
+.rec-lift strong { color: var(--rs-blue); font-weight: 700; }
+
+/* ── Ranked bars (all sampled plans) ── */
+.rec-bars { display: flex; flex-direction: column; gap: .4rem; }
+.rec-bar {
+  display: grid;
+  grid-template-columns: 130px 1fr 44px;
+  align-items: center;
+  gap: .7rem;
+  font-size: .72rem;
+}
+.rec-bar-label { color: var(--rs-ink-dim); text-align: right; white-space: nowrap; }
+.rec-bar-fill {
+  height: 8px;
+  border-radius: 6px;
+  background: rgba(21, 23, 58, .30);                       /* ink on pink */
+  width: var(--w);
+  animation: rec-grow .65s cubic-bezier(.2,.7,.2,1) both;
+}
+.rec-bar.is-best  .rec-bar-fill {
+  background: linear-gradient(90deg, #2b539e, #6db0ff);    /* blue highlight */
+  box-shadow: 0 0 16px rgba(45, 110, 200, .55);
+}
+.rec-bar.is-worst .rec-bar-fill { background: rgba(21, 23, 58, .15); }
+.rec-bar-val { color: var(--rs-ink-dim); font-variant-numeric: tabular-nums; }
+.rec-bar.is-best .rec-bar-val { color: var(--rs-blue); font-weight: 600; }
+
+@keyframes rec-grow { from { width: 0; } to { width: var(--w); } }
+
+@media (max-width: 680px) {
+  .rec-spotlight { grid-template-columns: 1fr; }
+  .rec-bar { grid-template-columns: 92px 1fr 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rec-bar-fill { animation: none; }
+  .rec-btn { transition: none; }
+}
