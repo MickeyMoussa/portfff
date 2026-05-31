@@ -284,13 +284,20 @@
     const btn = $('rec-run'), status = $('rec-status'), section = $('research');
     if (!btn || !section) return;
 
-    // Warm the bundle when the research slide approaches the viewport, so the
-    // first trial feels instant. Falls back to lazy load inside onRun().
+    // Auto-run the first trial as the research slide approaches the viewport, so
+    // it's already populated (never empty) by the time the visitor arrives. The
+    // 8 MB bundle is fetched lazily here — not on initial page load. Subsequent
+    // trials come from the button.
+    let started = false;
+    const autoStart = () => { if (!started) { started = true; onRun(btn, status); } };
+
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
-        if (es[0].isIntersecting) { engine.load().catch(() => {}); io.disconnect(); }
+        if (es[0].isIntersecting) { autoStart(); io.disconnect(); }
       }, { rootMargin: '600px' });
       io.observe(section);
+    } else {
+      autoStart();
     }
 
     btn.addEventListener('click', () => onRun(btn, status));
