@@ -859,3 +859,253 @@ main {
   .gplus-logo { transition: none; }
   .gplus-orb { animation: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Project slide — 16-bit RISC CPU (green bit-signal theme)
+   Shares the vertical-line + dot grid with Gaming+ for a smooth transition.
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --cpu-green:  #39f58c;
+  --cpu-green-dim: rgba(57, 245, 140, .22);
+  --cpu-ink:    #0a0f0d;
+}
+
+.cpu {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 7vh, 6rem) clamp(1.2rem, 5vw, 4rem);
+  scroll-snap-align: start;
+  /* vertical guide lines (120px — aligned with the Gaming+ slide above) + dots */
+  background-color: #060a08;
+  background-image:
+    linear-gradient(90deg, rgba(57,245,140,0.06) 1px, transparent 1px),
+    radial-gradient(circle at 1px 1px, rgba(57,245,140,0.05) 1px, transparent 0),
+    radial-gradient(1000px circle at 50% -10%, rgba(57,245,140,0.10), transparent 60%),
+    linear-gradient(180deg, #05070b 0%, #070d0b 50%, #04070a 100%);
+  background-size: 120px 100%, 4px 4px, 100% 100%, 100% 100%;
+}
+.cpu::after {   /* bottom vignette */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(1200px circle at 50% 125%, rgba(0,0,0,0.85), transparent 58%);
+}
+
+/* ── Cross-slide bit-signals ──────────────────────────────────────────────
+   A dim crimson/magenta light appears low in the Gaming+ slide and exits its
+   bottom edge; on the same 120px column, half a cycle later, the bright green
+   CPU signal enters the top — so the light reads as crossing the seam and
+   changing colour. Both share one period + per-column delay (set in cpu.js). */
+.cpu-fx { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.cpu-signal, .gplus-signal {
+  position: absolute; top: 0; width: 2px; height: 132px;
+  opacity: 0; will-change: transform, opacity;
+  animation-timing-function: linear; animation-iteration-count: infinite;
+}
+.gplus-signal {   /* Gaming+ palette, dimmer */
+  background: linear-gradient(to bottom, transparent, rgba(236,1,68,.5) 55%, rgba(203,1,182,.12));
+  filter: drop-shadow(0 0 4px rgba(236,1,68,.4));
+  animation-name: gp-cross;
+}
+.cpu-signal {     /* bright green */
+  background: linear-gradient(to bottom, transparent, var(--cpu-green) 70%, rgba(57,245,140,0));
+  filter: drop-shadow(0 0 5px var(--cpu-green));
+  animation-name: cpu-cross;
+}
+@keyframes gp-cross {        /* appears low in Gaming+, reaches its bottom edge at 50% */
+  0%   { transform: translateY(-4vh);  opacity: 0; }
+  30%  { transform: translateY(46vh);  opacity: 0; }
+  38%  { opacity: .6; }
+  50%  { transform: translateY(100vh); opacity: .6; }   /* exactly the seam */
+  50.01%, 100% { transform: translateY(-4vh); opacity: 0; }
+}
+@keyframes cpu-cross {       /* enters CPU's top edge at 50% (the seam), then descends */
+  0%, 49%  { transform: translateY(-2vh);  opacity: 0; }
+  50%  { transform: translateY(0vh);   opacity: .95; }   /* exactly the seam */
+  92%  { opacity: 1; }
+  100% { transform: translateY(102vh); opacity: 0; }
+}
+
+.cpu-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, 100%);
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: clamp(1.8rem, 4vw, 3.4rem);
+  align-items: center;
+}
+
+/* ── Left: datapath + program ── */
+.cpu-left { display: flex; flex-direction: column; gap: 1.1rem; min-width: 0; }
+.cpu-stage {
+  border: 1px solid var(--cpu-green-dim);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(10,20,16,.75), rgba(6,10,9,.8));
+  box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 0 50px rgba(57,245,140,.04);
+  padding: .8rem;
+}
+#cpu-datapath { width: 100%; height: auto; display: block; }
+
+/* datapath blocks */
+.block-box {
+  fill: rgba(14, 26, 21, .9);
+  stroke: rgba(57,245,140,.35);
+  stroke-width: 1.4;
+  transition: stroke .25s, filter .25s;
+}
+.block-label {
+  fill: #bfeede; font-size: 10px; font-weight: 500;
+  font-family: var(--font); letter-spacing: .02em;
+}
+.cpu-block.active .block-box {
+  stroke: var(--cpu-green);
+  filter: drop-shadow(0 0 7px rgba(57,245,140,.7));
+}
+.cpu-block.active .block-label { fill: #eafff4; }
+
+/* datapath wires */
+.wire-base { stroke: rgba(57,245,140,.16); stroke-width: 1.6; transition: stroke .2s; }
+.cpu-wire.live .wire-base { stroke: rgba(57,245,140,.4); }
+.wire-pulse {
+  stroke: var(--cpu-green); stroke-width: 2.6; stroke-linecap: round;
+  stroke-dasharray: 12 88; stroke-dashoffset: 100; opacity: 0;
+  filter: drop-shadow(0 0 4px var(--cpu-green));
+}
+.cpu-wire.live .wire-pulse { opacity: 1; animation: cpu-flow .85s linear infinite; }
+@keyframes cpu-flow { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+
+/* ── Lower: assembly + registers/controls ── */
+.cpu-lower {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1rem;
+}
+.cpu-asm {
+  border: 1px solid var(--cpu-green-dim);
+  border-radius: 12px;
+  background: rgba(6, 12, 10, .75);
+  overflow: hidden;
+}
+.cpu-asm-head {
+  font-family: var(--font); font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(57,245,140,.7);
+  padding: .5rem .8rem; border-bottom: 1px solid var(--cpu-green-dim);
+}
+.cpu-asm-list {
+  list-style: none; margin: 0; padding: .4rem;
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: .72rem; line-height: 1.25;
+  max-height: 230px; overflow: auto;
+}
+.cpu-asm-line {
+  display: flex; gap: .6rem; align-items: baseline;
+  padding: .16rem .5rem; border-left: 2px solid transparent; border-radius: 3px;
+  white-space: pre;
+}
+.asm-addr { color: rgba(255,255,255,.28); }
+.asm-code { color: #d7f7e6; }
+.asm-cmt  { color: rgba(57,245,140,.45); }
+.cpu-asm-line.current {
+  background: rgba(57,245,140,.14);
+  border-left-color: var(--cpu-green);
+}
+.cpu-asm-line.current .asm-code { color: #eafff4; text-shadow: 0 0 12px rgba(57,245,140,.6); }
+
+.cpu-side { display: flex; flex-direction: column; gap: .8rem; }
+.cpu-enc {
+  display: flex; flex-direction: column; gap: .15rem;
+  padding: .5rem .6rem; border-radius: 8px;
+  background: rgba(57,245,140,.06); border: 1px solid rgba(57,245,140,.16);
+  font-family: 'Courier New', monospace;
+}
+.enc-fields { font-size: .74rem; letter-spacing: .08em; color: var(--cpu-green); }
+.enc-fields.enc-idle { color: rgba(255,255,255,.3); letter-spacing: .2em; }
+.enc-hex { font-size: .62rem; color: rgba(255,255,255,.5); }
+.cpu-regs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem;
+}
+.cpu-reg {
+  display: flex; justify-content: space-between; align-items: baseline; gap: .4rem;
+  padding: .28rem .5rem; border-radius: 6px;
+  background: rgba(57,245,140,.05); border: 1px solid rgba(57,245,140,.12);
+  font-family: 'Courier New', monospace; font-size: .72rem;
+  transition: background .2s, border-color .2s;
+}
+.cpu-reg .reg-name { color: rgba(57,245,140,.7); }
+.cpu-reg .reg-val  { color: #eafff4; font-weight: 700; }
+.cpu-reg.cpu-reg--pc { grid-column: span 3; background: rgba(57,245,140,.08); }
+.cpu-reg.changed {
+  background: rgba(57,245,140,.25);
+  border-color: var(--cpu-green);
+  box-shadow: 0 0 14px rgba(57,245,140,.4);
+}
+
+/* data memory — fills with the Fibonacci values as sw runs */
+.cpu-mem { display: flex; flex-direction: column; gap: .35rem; }
+.cpu-mem-head {
+  font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(57,245,140,.7);
+}
+.cpu-memgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .3rem; }
+.cpu-memcell {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: .3rem .2rem; border-radius: 6px;
+  background: rgba(57,245,140,.04); border: 1px solid rgba(57,245,140,.1);
+  font-family: 'Courier New', monospace;
+  transition: background .25s, border-color .25s, box-shadow .25s;
+}
+.cpu-memcell .mem-idx { font-size: .5rem; letter-spacing: .04em; color: rgba(255,255,255,.3); }
+.cpu-memcell .mem-v   { font-size: .8rem; font-weight: 700; color: rgba(255,255,255,.22); }
+.cpu-memcell.filled { border-color: rgba(57,245,140,.32); background: rgba(57,245,140,.08); }
+.cpu-memcell.filled .mem-v { color: #eafff4; }
+.cpu-memcell.changed {
+  border-color: var(--cpu-green);
+  background: rgba(57,245,140,.22);
+  box-shadow: 0 0 14px rgba(57,245,140,.45);
+}
+
+.cpu-controls { display: flex; gap: .5rem; flex-wrap: wrap; }
+.cpu-btn {
+  appearance: none; cursor: none;
+  font-family: var(--font); font-size: .7rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: .55rem 1rem; border-radius: 999px;
+  color: var(--cpu-ink); background: var(--cpu-green); border: 1px solid var(--cpu-green);
+  box-shadow: 0 0 18px rgba(57,245,140,.35);
+  transition: transform .2s, box-shadow .25s, background .2s, color .2s;
+}
+.cpu-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 26px rgba(57,245,140,.5); }
+.cpu-btn--ghost {
+  color: var(--cpu-green); background: transparent; box-shadow: none;
+}
+.cpu-btn--ghost:hover { background: rgba(57,245,140,.12); box-shadow: none; }
+.cpu-status { font-size: .68rem; letter-spacing: .04em; color: rgba(255,255,255,.55); }
+
+/* ── Right: prose ── */
+.cpu-right { display: flex; flex-direction: column; gap: .9rem; }
+.cpu-eyebrow {
+  font-size: .64rem; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--cpu-green);
+}
+.cpu-title {
+  font-size: clamp(2rem, 4.6vw, 3.2rem); font-weight: 300; letter-spacing: .03em;
+  color: #fff; text-shadow: 0 0 40px rgba(57,245,140,.3);
+}
+.cpu-body {
+  max-width: 50ch; font-size: clamp(.98rem, 1.4vw, 1.12rem);
+  line-height: 1.8; color: var(--white-70);
+}
+
+@media (max-width: 900px) {
+  .cpu-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .cpu-lower { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cpu-wire.live .wire-pulse { animation: none; opacity: 1; stroke-dashoffset: 50; }
+  .cpu-btn { transition: none; }
+}

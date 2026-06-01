@@ -77,8 +77,8 @@
 
         <p class="research-body">
           Traditional actuarial risk leans on <span class="hl">unimodal data</span> and linear risk pools.
-          I modelled it instead as the interaction of <span class="hl">two vectors</span> — a policyholder's
-          traits and an insurance plan's characteristics — with a two-tower neural network that predicts
+          I modelled it instead as the interaction of <span class="hl">two vectors</span>: a policyholder's
+          traits and an insurance plan's characteristics that are fed into a two-tower neural network that predicts
           <span class="hl">expected coverage at the micro-level</span> across 407 benefit types.
           It's a research project, so there's no product link — instead, the model I trained is running
           <span class="hl">live, right here in your browser</span>.
@@ -163,10 +163,59 @@
         </div><!-- /gplus-body -->
       </div>
     </section>
+
+    <!-- ───────────────  Project — 16-bit RISC CPU  ─────────────── -->
+    <section class="cpu" id="cpu">
+      <!-- green bit-signals travelling down the vertical lines -->
+      <div class="cpu-fx" aria-hidden="true"></div>
+
+      <div class="cpu-inner">
+        <div class="cpu-left">
+          <div class="cpu-stage">
+            <svg id="cpu-datapath" role="img" aria-label="16-bit RISC datapath"></svg>
+          </div>
+
+          <div class="cpu-lower">
+            <div class="cpu-asm">
+              <div class="cpu-asm-head">fibonacci.asm</div>
+              <ol id="cpu-asm-list" class="cpu-asm-list"></ol>
+            </div>
+            <div class="cpu-side">
+              <div id="cpu-enc" class="cpu-enc"></div>
+              <div id="cpu-regs" class="cpu-regs"></div>
+              <div class="cpu-mem">
+                <div class="cpu-mem-head">data memory — fib(n)</div>
+                <div id="cpu-memgrid" class="cpu-memgrid"></div>
+              </div>
+              <div class="cpu-controls">
+                <button id="cpu-play" class="cpu-btn" type="button">▶ run</button>
+                <button id="cpu-step" class="cpu-btn cpu-btn--ghost" type="button">step</button>
+                <button id="cpu-reset" class="cpu-btn cpu-btn--ghost" type="button">reset</button>
+              </div>
+              <span id="cpu-status" class="cpu-status"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cpu-right">
+          <span class="cpu-eyebrow">hardware · verilog &amp; logisim</span>
+          <h2 class="cpu-title">16-bit RISC CPU</h2>
+          <p class="cpu-body">
+            A solo, three-day build of a 16-bit single-cycle processor implementing a MIPS-style
+            RISC ISA — an 8-register file, ALU with custom control, sign-extension, data memory,
+            and branch/jump logic, all wired from the gate level up. The demo on the left runs a
+            real Fibonacci program one instruction at a time; watch the bit signals travel the
+            exact path each instruction takes through the datapath.
+            <!-- Edit this paragraph freely. -->
+          </p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="js/blackhole.js"></script>
   <script src="js/hero.js"></script>
   <script src="js/recommender.js"></script>
+  <script src="js/cpu.js"></script>
 </body>
 </html>
