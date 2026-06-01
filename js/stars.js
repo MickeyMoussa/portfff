@@ -4,7 +4,9 @@
 //  tiny (mostly 1px) so the field reads as quiet texture, not noise.
 (function () {
   function fill(host) {
-    const count = Math.min(240, Math.round((innerWidth * innerHeight) / 8500));
+    // scale density to the field's real height (the sky spans two slides)
+    const h = host.offsetHeight || innerHeight * 2;
+    const count = Math.min(480, Math.round((innerWidth * h) / 8500));
     const frag = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
       const s = document.createElement('span');
@@ -26,10 +28,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const host = document.querySelector('#recognition .rr-stars');
-    if (!host) return;
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)
-      host.classList.add('no-twinkle');
-    fill(host);
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.sky-stars, .rr-stars').forEach((host) => {
+      if (reduce) host.classList.add('no-twinkle');
+      fill(host);
+    });
   });
 })();

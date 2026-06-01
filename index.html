@@ -19,21 +19,13 @@
   <a class="brand" id="brand" href="#hero" aria-label="Yazeed Faris">يزيد فارس</a>
 
   <header class="hero" id="hero">
-    <nav class="nav">
-      <ul class="nav-links">
-        <li><a href="#research">Research</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-
     <div class="hero-center">
       <h1 class="hero-name" aria-label="Hi, I'm Yazeed">
         <span id="type" class="type-text" aria-hidden="true"></span><span class="caret" aria-hidden="true"></span>
       </h1>
       <nav class="hero-cta" id="hero-cta" aria-label="Primary">
         <a class="cta" href="#about"><span>about me</span></a>
-        <a class="cta" href="#projects"><span>some of my work</span></a>
+        <a class="cta" href="#research"><span>some of my work</span></a>
       </nav>
     </div>
 
@@ -212,9 +204,12 @@
       </div>
     </section>
 
+    <!-- Recognition + Contact share one continuous sky panorama (no seam) -->
+    <div class="sky">
+      <div class="sky-stars" aria-hidden="true"></div>
+
     <!-- ───────────────  Research & Recognition  ─────────────── -->
     <section class="rr" id="recognition">
-      <div class="rr-stars" aria-hidden="true"></div>
       <div class="rr-inner">
         <header class="rr-head">
           <span class="rr-eyebrow">beyond the featured work</span>
@@ -274,12 +269,32 @@
         </div>
       </div>
     </section>
+
+    <!-- ───────────────  Contact  ─────────────── -->
+    <section class="contact" id="contact">
+      <div class="contact-inner">
+        <span class="contact-eyebrow">let's work together</span>
+        <h2 class="contact-title">Get in touch</h2>
+        <p class="contact-sub">Got an idea, a question, or a role in mind? I'd love to hear it.</p>
+        <a class="contact-email" href="mailto:main@yazeed.systems">main@yazeed.systems</a>
+        <div class="contact-links">
+          <a href="mailto:main@yazeed.systems">Email</a>
+          <a href="assets/YazeedFarisCV260.pdf" target="_blank" rel="noopener noreferrer">Résumé</a>
+        </div>
+        <div class="contact-foot">يزيد فارس · Yazeed Faris · 2026</div>
+      </div>
+    </section>
+    </div><!-- /sky -->
   </main>
+
+  <!-- left section indicator (dots) — populated by js/nav.js -->
+  <nav class="dotnav" id="dotnav" aria-label="Section navigation"></nav>
 
   <script src="js/blackhole.js"></script>
   <script src="js/hero.js"></script>
   <script src="js/recommender.js"></script>
   <script src="js/cpu.js"></script>
   <script src="js/stars.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>
