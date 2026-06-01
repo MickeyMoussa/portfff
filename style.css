@@ -1109,3 +1109,107 @@ main {
   .cpu-wire.live .wire-pulse { animation: none; opacity: 1; stroke-dashoffset: 50; }
   .cpu-btn { transition: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Research & Recognition — compact recap (baby-blue accent, starfield bg)
+   ════════════════════════════════════════════════════════════════════════ */
+:root { --rr-blue: #8fc3ff; }
+
+.rr {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4rem, 9vh, 7rem) clamp(1.2rem, 5vw, 4rem);
+  scroll-snap-align: start;
+  /* deep space with faint blue/purple nebulae — echoes the hero, no black hole */
+  background:
+    radial-gradient(1200px circle at 18% 14%, rgba(46,60,130,0.13), transparent 55%),
+    radial-gradient(1100px circle at 84% 80%, rgba(95,42,116,0.13), transparent 55%),
+    radial-gradient(1500px circle at 50% 122%, rgba(30,46,92,0.10), transparent 60%),
+    linear-gradient(180deg, #04040a 0%, #050411 52%, #030308 100%);
+}
+
+/* small twinkling starfield (populated by js/stars.js) */
+.rr-stars { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.rr-star {
+  position: absolute; border-radius: 50%; background: #fff;
+  animation-name: rr-twinkle; animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+.rr-star.bright { box-shadow: 0 0 3px rgba(255,255,255,.6); }
+@keyframes rr-twinkle {
+  0%, 100% { opacity: var(--o, .7); }
+  50%      { opacity: calc(var(--o, .7) * 0.3); }
+}
+.rr-stars.no-twinkle .rr-star { animation: none; }
+
+.rr-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1080px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.2rem);
+}
+.rr-head { display: flex; flex-direction: column; align-items: center; gap: .7rem; text-align: center; }
+.rr-eyebrow {
+  font-size: .64rem; letter-spacing: .3em; text-transform: uppercase; color: var(--rr-blue);
+}
+.rr-title {
+  font-size: clamp(2rem, 4.6vw, 3.2rem); font-weight: 300; letter-spacing: .03em;
+  color: #fff; text-shadow: 0 0 40px rgba(120,185,255,.28);
+}
+
+.rr-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(1.6rem, 4vw, 3rem);
+  align-items: start;
+}
+
+/* research experience card */
+.rr-exp {
+  border: 1px solid rgba(130,195,255,.18);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(16,22,40,.5), rgba(8,10,18,.55));
+  padding: clamp(1.2rem, 2.5vw, 1.7rem);
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.rr-exp-role { font-size: 1.2rem; font-weight: 500; color: #fff; }
+.rr-exp-org  { font-size: .85rem; color: rgba(130,195,255,.92); }
+.rr-exp-date {
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--white-30);
+}
+.rr-exp-points { list-style: none; display: flex; flex-direction: column; gap: .7rem; margin-top: .7rem; }
+.rr-exp-points li {
+  position: relative; padding-left: 1.1rem;
+  font-size: .9rem; line-height: 1.6; color: var(--white-70);
+}
+.rr-exp-points li::before {
+  content: ""; position: absolute; left: 0; top: .58em;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(130,195,255,.9); box-shadow: 0 0 8px rgba(120,185,255,.5);
+}
+
+/* honors list */
+.rr-honors { list-style: none; display: flex; flex-direction: column; gap: .9rem; }
+.rr-honor {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding-bottom: .9rem; border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.rr-honor:last-child { padding-bottom: 0; border-bottom: none; }
+.rr-year {
+  flex: 0 0 auto; min-width: 3.1rem; text-align: center; margin-top: .12rem;
+  font-size: .64rem; font-weight: 700; letter-spacing: .06em;
+  color: var(--rr-blue); background: rgba(130,195,255,.1);
+  border: 1px solid rgba(130,195,255,.3); border-radius: 999px; padding: .26rem .5rem;
+}
+.rr-honor-body h3 { font-size: .95rem; font-weight: 500; color: #fff; margin-bottom: .22rem; }
+.rr-honor-body p  { font-size: .82rem; line-height: 1.55; color: var(--white-70); }
+
+@media (max-width: 820px) {
+  .rr-grid { grid-template-columns: 1fr; }
+}
