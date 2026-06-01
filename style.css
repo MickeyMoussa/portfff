@@ -56,6 +56,15 @@ a { color: inherit; text-decoration: none; }
   transition: width .2s, height .2s, opacity .2s;
 }
 
+/* Touch / no-hover devices (phones, tablets) have no pointer to track — hide the
+   custom cursor entirely and restore the native cursor. PCs with a mouse keep it. */
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring { display: none; }
+  html, body,
+  .rec-btn, .cpu-btn, .dot, .gplus-logo-link { cursor: auto; }
+}
+
 /* ── WebGL Canvas ── */
 #bh-canvas {
   position: fixed;
@@ -1131,6 +1140,36 @@ main {
 .sky-stars {
   position: absolute; inset: 0; z-index: 0;
   overflow: hidden; pointer-events: none;
+}
+
+/* Falling stars — the CPU slide's green bit-lights hand off at the seam and
+   continue down the sky as pale shooting stars (same 120px columns + cadence). */
+.sky-fall {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  /* Stars fall in every column, but fade out vertically as they approach the
+     two text bands (Recognition ~9–41%, Contact ~64–86% of the sky) — visible at
+     the CPU crossover (top), in the open gap between the slides, and at the
+     bottom, gone where the text is. */
+  -webkit-mask-image: linear-gradient(to bottom,
+    #000 0%, #000 4%, transparent 9%, transparent 42%,
+    #000 49%, #000 57%, transparent 63%, transparent 87%, #000 93%, #000 100%);
+  mask-image: linear-gradient(to bottom,
+    #000 0%, #000 4%, transparent 9%, transparent 42%,
+    #000 49%, #000 57%, transparent 63%, transparent 87%, #000 93%, #000 100%);
+}
+.sky-fall-star {
+  position: absolute; top: 0; width: 2px; height: 92px;
+  background: linear-gradient(to bottom, rgba(150,200,255,0), rgba(184,216,255,.95));
+  border-radius: 2px;
+  filter: drop-shadow(0 0 6px rgba(165,205,255,.8));
+  opacity: 0; will-change: transform, opacity;
+  animation-name: sky-fall; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+@keyframes sky-fall {
+  0%   { transform: translateY(-4vh);  opacity: 0; }
+  3%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateY(205vh); opacity: 0; }
 }
 
 .rr {

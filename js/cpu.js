@@ -321,6 +321,7 @@
   function stop() {
     playing = false; clearInterval(timer); timer = null;
     const b = $('cpu-play'); if (b) b.textContent = '▶ run';
+    if (!cpu.halted) setStatus('paused');     // halt/reset set their own status after
   }
   function doReset() {
     stop(); cpu.reset(); paint(null); dp.clear();
@@ -332,11 +333,12 @@
   // the slide above and the bright green CPU light below share each column's
   // period + delay, so the light reads as crossing the seam and turning green.
   // (Honours reduced-motion by not spawning anything.)
-  const PERIOD = 6.4;   // seconds for a full two-slide crossing
+  const PERIOD = 6.4;   // seconds for a full slide-to-slide crossing
   function seedSignals() {
     if (matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const gp = document.querySelector('#gaming-plus .gplus-fx');
-    const cp = document.querySelector('#cpu .cpu-fx');
+    const gp  = document.querySelector('#gaming-plus .gplus-fx');
+    const cp  = document.querySelector('#cpu .cpu-fx');
+    const sky = document.querySelector('.sky-fall');   // continues past the CPU as stars
     const cols = Math.ceil(innerWidth / 120) + 1;
     for (let k = 0; k < cols; k++) {
       if (k % 3 === 1) continue;                      // sparser, deterministic
@@ -350,8 +352,11 @@
         s.style.animationDelay = delay;
         host.appendChild(s);
       };
+      // dim Gaming+ light → bright green CPU light → falling star in the sky,
+      // all on the same column + cadence, handing off at each slide seam.
       mk('gplus-signal', gp);
       mk('cpu-signal', cp);
+      mk('sky-fall-star', sky);
     }
   }
 
