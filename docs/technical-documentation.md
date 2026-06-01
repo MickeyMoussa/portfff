@@ -1,30 +1,73 @@
 # Technical Documentation
 
-## Overview
-Single-page portfolio inspired by Andrew Ng. Core sections: hero, about, projects (filter/sort + toggle visibility), GitHub API feed, and contact form with validation. States are managedby `js/script.js` via an array of object; no build tools or frameworks required.
+A single-page, dependency-free portfolio (vanilla HTML/CSS/JS, raw WebGL). No
+framework, no bundler. `index.html` defines the slides; `style.css` holds all
+styling; each `js/*.js` file is a self-contained module attached on
+`DOMContentLoaded`.
 
-## Architecture
-- `index.html`: semantic structure and UI controls.
-- `css/styles.css`: theming (light/dark), layout grid, responsive rules.
-- `js/script.js`: state management, rendering logic, API integration, validation.
-- `assets/images/`: optional optimized assets (not committed to keep repo light).
+## Sections & accent colors
+| Section            | id              | accent            |
+|--------------------|-----------------|-------------------|
+| Hero (black hole)  | `#hero`         | —                 |
+| About              | `#about`        | pink `#e79bff`    |
+| Actuarial ML       | `#research`     | dark blue `#1d3f7c` (on pink slide) |
+| Gaming+            | `#gaming-plus`  | crimson `#ec0144` |
+| 16-bit CPU         | `#cpu`          | green `#39f58c`   |
+| Recognition        | `#recognition`  | baby blue `#8fc3ff` |
+| Contact            | `#contact`      | white             |
 
-## State & Logic
-- `state`: `{ projectsVisible, theme, visitorName, visitSeconds }` persisted (theme/name).
-- Theme toggle: overrides css panel by setting the data-theme atrtribute as dark.
-- Greeting persistence: updates on name input thats captured from the contact form input.
-- Visit timer: refreshes when page is refreshed
-- Projects: filter (`select#project-filter`) and sort (`select#project-sort`) to filter projects and sort them based on categories and alphabetical order or time order.
-- GitHub feed: `fetchRepos(username)` calls `https://api.github.com/users/{user}/repos?sort=updated&per_page=5` to populate elmenets of the card class with the latest github repos with error handling.
-- Contact validation: checks name length >= 2, email pattern, message length >= 10, and consent checkbox. with error and success alerts.
+## Modules
 
-## API Integration
-- Endpoint: await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=5`) for latest 5 pages
-- Error handling: non-OK responses and network failures surface friendly status text; console logs for debugging.
-- Loading: to make user aware of whats happening
+### `js/blackhole.js` — hero
+A self-contained WebGL Schwarzschild black-hole raytracer: photon geodesics are
+integrated via the Binet equation, with a thin Shakura–Sunyaev accretion disk,
+Doppler beaming, an explicit photon ring, and a lensed procedural starfield. A
+second pass bends the disk light around the hero CTA labels. Adaptive resolution
+and WebGL context-loss recovery are built in. No three.js — raw WebGL + inline GLSL.
 
+### `js/recommender.js` + `assets/model/` — live ML demo
+Runs the real trained two-tower model **client-side**, no server:
+- `tools/export_recommender.py` reads the Keras `.h5` with h5py, int8-quantizes the
+  Dense kernels (per-output-column), and emits `recommender.json` (topology + a
+  byte-offset manifest), `recommender.bin` (~8 MB), and `plans.json` (sampled real
+  ACA plans + covered-benefit indices).
+- `recommender.js` binds typed-array views into the `.bin` and runs a hand-rolled
+  forward pass (dense / LeakyReLU / BatchNorm / concat / softmax), validated to
+  within 1.6e-3 of the original float32 model. A "trial" draws a random
+  policyholder, scores sampled plans, and spotlights best vs. worst.
 
-## Extensibility Notes
-- Replace placeholder hero copy and connect `Download CV` button to a PDF.
-- Add more project entries to the `projects` array with `title`, `category`, `date`, `summary`, `stack`.
-- Swap GitHub feed for another API by reusing the status + card pattern.
+### `js/cpu.js` — 16-bit RISC datapath
+A faithful functional model of the COE-301 ISA: registers R0–R7 (R0 = 0), 16-bit
+words, R/I/J formats (`Op5 f2 Rd Rs Rt` / `Op5 Imm5 Rs Rt` / `Op5 Imm11`). It runs
+a real Fibonacci program one instruction at a time; per instruction it lights the
+active datapath wires (SVG), animates green signal pulses along them, shows the
+live machine-code encoding, and fills a data-memory view (0,1,1,2,3,5,8,13).
+
+### Cross-slide signal flow (`cpu.js` + `stars.js`)
+Bit-signals share one set of 120px columns across three slides: a dim Gaming+
+light → the bright green CPU bit-light → a pale **falling star** in the sky, each
+handing off at the slide seam (same period + per-column delay). The falling stars
+are masked to fade out across the two text bands so they never streak through copy.
+
+### `js/stars.js` — closing sky
+Recognition + Contact are wrapped in one `.sky` container with a single gradient
+and one starfield spanning both, so there's no seam between them. `stars.js`
+scatters small twinkling stars scaled to the combined height.
+
+### `js/nav.js` — section indicator
+A fixed left dot-nav: one dot per section in that section's accent. An
+`IntersectionObserver` (centre band) marks the active section — the active dot
+enlarges, fills, glows, and shows its label. Hidden over the hero; dots
+smooth-scroll on click; hidden under 600px.
+
+## Accessibility / responsiveness
+- Honors `prefers-reduced-motion` (typewriter, signals, falling stars, twinkle).
+- The custom cursor is disabled on touch / no-hover devices (`@media (hover: none)`).
+- Layouts collapse to single-column on small viewports.
+
+## Regenerating the model bundle
+```bash
+python tools/export_recommender.py   # needs h5py, numpy, pandas, scikit-learn
+```
+Reads the source `.h5` / pickles (paths configurable via the `REC_SRC` env var) and
+rewrites `assets/model/`.
