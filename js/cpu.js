@@ -264,6 +264,16 @@
       memEls.push(d);
     }
   }
+  // Keep the active line visible by scrolling ONLY the listing element — using
+  // element.scrollIntoView() here would also scroll the page (every step) and
+  // trap the viewport on this slide.
+  function scrollListToLine(node) {
+    const list = $('cpu-asm-list');
+    if (!list) return;
+    const cr = list.getBoundingClientRect(), lr = node.getBoundingClientRect();
+    if (lr.top < cr.top) list.scrollTop -= (cr.top - lr.top) + 6;
+    else if (lr.bottom > cr.bottom) list.scrollTop += (lr.bottom - cr.bottom) + 6;
+  }
   function paint(trace) {
     // registers
     for (let i = 0; i < 8; i++) {
@@ -277,7 +287,7 @@
     if (trace) {
       const n = asmEls[trace.index];
       n.classList.add('current');
-      n.scrollIntoView({ block: 'nearest' });
+      scrollListToLine(n);              // scroll the listing only — never the page
       if (enc) enc.innerHTML =
         `<span class="enc-fields">${trace.enc.fields}</span>` +
         `<span class="enc-hex">0x${(trace.enc.word & 0xffff).toString(16).toUpperCase().padStart(4, '0')}</span>`;
@@ -360,12 +370,15 @@
     $('cpu-step').addEventListener('click', () => { stop(); doStep(); });
     $('cpu-reset').addEventListener('click', doReset);
 
-    // auto-run when the slide scrolls into view (once)
+    // Auto-run once when the slide enters view; pause whenever it leaves so the
+    // clock (and its in-list auto-scroll) never runs while you're elsewhere.
     let started = false;
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => {
-        if (es[0].isIntersecting && !started) { started = true; play(); io.disconnect(); }
-      }, { threshold: 0.45 });
+        const visible = es[0].isIntersecting;
+        if (visible && !started) { started = true; play(); }
+        else if (!visible && playing) { stop(); }
+      }, { threshold: 0.4 });
       io.observe(section);
     }
   });
