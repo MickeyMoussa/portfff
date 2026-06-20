@@ -4,7 +4,7 @@ An interactive, single-page portfolio built from scratch in vanilla HTML/CSS/JS 
 no framework, no build step. Each section is a full-height "slide" with its own
 visual identity, and two of them run **real, live demos** in the browser.
 
-🌐 **Live:** _add your deployed URL here_
+🌐 **Live:** _yazeed.systems_
 
 ## Sections
 - **Hero** — a self-contained WebGL Schwarzschild black-hole raytracer (geodesic
