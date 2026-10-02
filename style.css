@@ -8,6 +8,8 @@
   --white-30:  rgba(255,255,255,0.30);
   --white-12:  rgba(255,255,255,0.12);
   --accent:    rgba(100,175,255,0.90);
+  --splash:        #ffff55;   /* Minecraft splash yellow */
+  --splash-shadow: #3f3f15;   /* its hard, un-blurred drop shadow */
   --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -214,6 +216,81 @@ a { color: inherit; text-decoration: none; }
 @keyframes caret-blink {
   0%, 50%       { opacity: 1; }
   50.01%, 100%  { opacity: 0; }
+}
+
+/* ── Splash quote (Minecraft title-screen homage) ──
+   Absolutely positioned so it never moves the name or the CTAs (the WebGL lens
+   is locked to their rectangles). Its centre is pinned to the name's right end. */
+.hero-name { position: relative; }
+.splash {
+  position: absolute;
+  left: calc(100% + .3em);         /* just clear of the caret */
+  top: -4%;                         /* raised so the tilted line's low end clears the name */
+  width: 0; height: 0;              /* zero-size anchor: the text centres on it */
+  pointer-events: none;
+  z-index: 2;
+}
+.splash-text {
+  --len-scale: 1;
+  --tx: -6%;                        /* lean out to the right of the name */
+  --ty: -85%;
+  position: absolute;
+  left: 0; top: 0;
+  display: block;
+  width: max-content;
+  max-width: 13em;
+  font-family: 'VT323', ui-monospace, monospace;
+  font-size: calc(clamp(1.5rem, 2.8vw, 2.3rem) * var(--len-scale));
+  line-height: .95;
+  letter-spacing: .02em;
+  white-space: normal;              /* long quotes wrap to centred lines */
+  text-align: center;
+  color: var(--splash);
+  text-shadow: .1em .1em 0 var(--splash-shadow);
+  background: none;
+  border: 0;
+  padding: .15em .25em;
+  cursor: none;                     /* the site's custom cursor stays in charge */
+  pointer-events: auto;             /* .hero is pointer-events: none */
+  transform: translate(var(--tx), var(--ty)) rotate(20deg) scale(0);
+  transform-origin: center;
+  opacity: 0;
+}
+.splash-text:focus-visible { outline: 1px dashed var(--splash); outline-offset: 4px; }
+
+.splash.is-shown .splash-text {
+  opacity: 1;
+  animation: splash-pop .45s cubic-bezier(.2, 1.6, .4, 1) both,
+             splash-pulse .5s ease-in-out .45s infinite alternate;
+}
+.splash.is-shown.is-swapping .splash-text {
+  animation: splash-pop .3s cubic-bezier(.2, 1.6, .4, 1) both,
+             splash-pulse .5s ease-in-out .3s infinite alternate;
+}
+@keyframes splash-pop {
+  from { transform: translate(var(--tx), var(--ty)) rotate(20deg) scale(0); }
+  to   { transform: translate(var(--tx), var(--ty)) rotate(20deg) scale(1); }
+}
+@keyframes splash-pulse {
+  from { transform: translate(var(--tx), var(--ty)) rotate(20deg) scale(1); }
+  to   { transform: translate(var(--tx), var(--ty)) rotate(20deg) scale(1.08); }
+}
+
+@media (max-width: 540px) {
+  .splash { left: 74%; top: -10%; }   /* sits above the name's right end */
+  .splash-text {
+    --tx: -50%;
+    --ty: -85%;
+    font-size: calc(1.15rem * var(--len-scale));
+    max-width: 9em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash.is-shown .splash-text,
+  .splash.is-shown.is-swapping .splash-text {
+    animation: none;
+    transform: translate(var(--tx), var(--ty)) rotate(20deg);
+  }
 }
 
 /* ── Hero CTAs ── */
