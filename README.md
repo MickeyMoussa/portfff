@@ -8,7 +8,8 @@ visual identity, and two of them run **real, live demos** in the browser.
 
 ## Sections
 - **Hero** — a self-contained WebGL Schwarzschild black-hole raytracer (geodesic
-  ray-marching, accretion disk, lensed starfield) with a typewriter intro.
+  ray-marching, accretion disk, lensed starfield) with a typewriter intro and
+  Minecraft-style splash quotes (random per visit, click to cycle).
 - **About** — short bio.
 - **Actuarial ML (SDAIA research)** — a **live in-browser run of the actual
   trained model**: a two-tower neural network for healthcare-plan recommendation.
