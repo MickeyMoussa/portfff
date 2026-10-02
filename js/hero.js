@@ -25,7 +25,7 @@
   const SPLASHES = [
     'Riding sinusoidal waves',
     'A lower center of gravity helps with back flips',
-    'Json? never heard of the him',
+    'Json? never heard of him',
     'Sunbathing on Mars',
     { text: 'Another night owl huh', when: isNight },   // only offered at night
     'X and Y axes stimming',
